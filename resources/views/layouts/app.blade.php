@@ -1073,7 +1073,7 @@ use App\Helpers\UnionHelper;
             initMobileMenu();
             initQuickActionsMenu();
             initBackToTop();
-            initMessages();
+            // initMessages();
             initFormLoading();
             initTouchSupport();
             

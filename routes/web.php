@@ -182,6 +182,12 @@ Route::middleware(['auth'])->group(function () {
 
         // -------- PAYMENTS --------
         Route::prefix('payments')->name('payments.')->group(function () {
+            Route::get('/bkash/payment', [App\Http\Controllers\BkashTokenizePaymentController::class,'index']);
+            Route::get('/bkash/create-payment', [App\Http\Controllers\BkashTokenizePaymentController::class,'createPayment'])->name('bkash-create-payment');
+            Route::get('/bkash/callback', [App\Http\Controllers\BkashTokenizePaymentController::class,'callBack'])->name('bkash-callBack');
+
+
+
             Route::get('/{invoice}', [PaymentController::class, 'showPaymentPage'])->name('show');
             Route::post('/{invoice}/initiate', [PaymentController::class, 'initiatePayment'])->name('initiate');
             Route::post('/{invoice}/bkash', [PaymentController::class, 'directBkashPayment'])->name('bkash.direct');
@@ -638,3 +644,5 @@ Route::get('/debug-db', function() {
 Route::fallback(function () {
     return response()->view('errors.404', [], 404);
 });
+
+

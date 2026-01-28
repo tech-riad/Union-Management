@@ -144,7 +144,7 @@
                 <!-- Gateway Specific Forms -->
                 
                 <!-- bKash Form -->
-                <div id="bkash_form" class="gateway-form">
+                <div  class="gateway-form">
                     <div class="bg-green-50 border border-green-200 rounded-xl p-5 mb-6">
                         <h4 class="font-semibold text-green-800 mb-3">bKash পেমেন্ট নির্দেশনা</h4>
                         <ul class="space-y-2 text-green-700 text-sm">
@@ -169,42 +169,21 @@
                         </ul>
                     </div>
 
-                    <form id="bkashPaymentForm" action="{{ route('citizen.payments.initiate', $invoice) }}" method="POST">
-                        @csrf
-                        <div class="mb-6">
-                            <label for="bkash_mobile" class="block text-gray-700 text-sm font-medium mb-2">
-                                bKash মোবাইল নম্বর *
-                            </label>
-                            <input type="text" 
-                                   id="bkash_mobile" 
-                                   name="mobile"
-                                   required
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                                   placeholder="01XXXXXXXXX"
-                                   pattern="01[3-9]\d{8}"
-                                   maxlength="11"
-                                   value="01712345678">
-                            <p class="text-sm text-gray-500 mt-1">bKash অ্যাকাউন্টের মোবাইল নম্বর দিন</p>
-                        </div>
+                    <form id="bkashPaymentForm"
+                        action="{{ route('citizen.payments.bkash-create-payment') }}"
+                        method="GET"
+                        class="gateway-form"
+                        >
+                        <input type="hidden" name="invoice_no" value="{{ $invoice->id }}">
+                        <input type="hidden" name="amount" value="{{ $invoice->amount }}">
 
-                        <!-- Submit Button for bKash -->
-                        <div class="mb-6">
-                            <button type="submit" 
-                                    id="bkashSubmitBtn"
-                                    class="w-full py-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-lg hover:from-green-600 hover:to-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 transition duration-300">
-                                <div class="flex items-center justify-center">
-                                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    bKash পেমেন্ট করুন - ৳ {{ number_format($invoice->amount, 2) }}
-                                </div>
-                            </button>
-                            <p class="text-sm text-center text-gray-500 mt-3">
-                                bKash পেমেন্ট পেজে রিডাইরেক্ট হবে
-                            </p>
-                        </div>
+                        <button type="submit" id="bkashSubmitBtn"
+                            class="w-full bg-green-600 text-white py-3 rounded font-bold">
+                            bKash Pay ৳{{ number_format($invoice->amount, 2) }}
+                        </button>
                     </form>
+
+
                 </div>
 
                 <!-- Manual Payment Form -->
@@ -362,200 +341,93 @@
         </div>
     </div>
 </div>
-
 @push('scripts')
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const loadingSpinner = document.getElementById('loadingSpinner');
-    const errorMessage = document.getElementById('errorMessage');
-    const errorText = document.getElementById('errorText');
-    
-    // Show gateway specific forms based on selection
-    document.querySelectorAll('input[name="gateway"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            // Hide all forms
-            document.querySelectorAll('.gateway-form').forEach(form => {
-                form.classList.add('hidden');
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+
+        function showError(msg) {
+            errorText.innerText = msg;
+            errorMessage.classList.remove('hidden');
+        }
+
+        function resetForm(btn) {
+            btn.disabled = false;
+            btn.innerHTML = 'bKash Pay';
+        }
+
+        const bkashForm = document.getElementById('bkashPaymentForm');
+
+        if (bkashForm) {
+            bkashForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const submitBtn = document.getElementById('bkashSubmitBtn');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = 'প্রক্রিয়াকরণ হচ্ছে...';
+
+                const params = new URLSearchParams(new FormData(this)).toString();
+
+                window.location.href = this.action + '?' + params;
             });
-            
-            // Show selected form
-            const formId = this.dataset.formId;
-            if (formId) {
-                document.getElementById(formId).classList.remove('hidden');
-            }
-        });
+        }
+
+    });
+</script>
+
+{{-- <script>
+document.getElementById('bkashPayBtn').addEventListener('click', function () {
+
+    bKash.init({
+        paymentMode: 'checkout',
+
+        paymentRequest: {
+            amount: "{{ $invoice->amount }}",
+            intent: 'sale'
+        },
+
+        createRequest: function (request) {
+            fetch("{{ route('bkash.create') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({
+                    invoice_id: "{{ $invoice->id }}"
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                bKash.create().onSuccess(data);
+            });
+        },
+
+        executeRequestOnAuthorization: function () {
+            fetch("{{ route('bkash.execute') }}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Payment Successful!');
+                    location.reload();
+                }
+            });
+        }
     });
 
-    // Initially show bKash form
-    document.getElementById('bkash_form').classList.remove('hidden');
-
-    // bKash Form Submission
-    const bkashForm = document.getElementById('bkashPaymentForm');
-    if (bkashForm) {
-        bkashForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const mobileInput = document.getElementById('bkash_mobile');
-            const mobile = mobileInput.value;
-            
-            // Validate mobile number
-            if (!/^01[3-9]\d{8}$/.test(mobile)) {
-                showError('দয়া করে একটি সঠিক bKash মোবাইল নম্বর দিন (01XXXXXXXXX)');
-                mobileInput.focus();
-                return;
-            }
-            
-            // Show loading
-            const submitBtn = document.getElementById('bkashSubmitBtn');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = `
-                <div class="flex items-center justify-center">
-                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    প্রক্রিয়াকরণ হচ্ছে...
-                </div>
-            `;
-            errorMessage.classList.add('hidden');
-            
-            try {
-                const formData = new FormData(this);
-                const response = await fetch(this.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
-                    }
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    // Redirect to bKash payment page
-                    if (data.bkashURL) {
-                        window.location.href = data.bkashURL;
-                    } else if (data.paymentID) {
-                        // If we get paymentID, we need to redirect to bKash
-                        window.location.href = '/bkash/test-payment/' + data.paymentID;
-                    } else {
-                        showError('bKash পেমেন্ট লিঙ্ক পাওয়া যায়নি');
-                        resetForm(submitBtn);
-                    }
-                } else {
-                    showError(data.message || 'bKash পেমেন্ট শুরু করতে সমস্যা হয়েছে');
-                    resetForm(submitBtn);
-                }
-            } catch (error) {
-                console.error('bKash payment error:', error);
-                showError('নেটওয়ার্ক ত্রুটি। অনুগ্রহ করে আবার চেষ্টা করুন');
-                resetForm(submitBtn);
-            }
-        });
-    }
-
-    // Manual Payment Form Submission
-    const manualForm = document.getElementById('manualPaymentForm');
-    if (manualForm) {
-        manualForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const paymentDate = document.getElementById('payment_date').value;
-            
-            // Validate payment date
-            if (!paymentDate) {
-                showError('দয়া করে পেমেন্ট তারিখ নির্বাচন করুন');
-                return;
-            }
-            
-            const today = new Date().toISOString().split('T')[0];
-            if (paymentDate > today) {
-                showError('পেমেন্ট তারিখ আজকের তারিখের পরে হতে পারবে না');
-                return;
-            }
-            
-            // Show loading
-            const submitBtn = this.querySelector('button[type="submit"]');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = `
-                <div class="flex items-center justify-center">
-                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    নিশ্চিত করা হচ্ছে...
-                </div>
-            `;
-            errorMessage.classList.add('hidden');
-            
-            try {
-                const formData = new FormData(this);
-                const response = await fetch(this.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
-                    }
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    // Redirect to success page
-                    window.location.href = '{{ route('citizen.payments.success') }}?invoice=' + data.invoice_id;
-                } else {
-                    showError(data.message || 'অফলাইন পেমেন্ট নিশ্চিত করতে সমস্যা হয়েছে');
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = `
-                        <div class="flex items-center justify-center">
-                            <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/>
-                                <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"/>
-                            </svg>
-                            অফলাইন পেমেন্ট নিশ্চিত করুন
-                        </div>
-                    `;
-                }
-            } catch (error) {
-                console.error('Manual payment error:', error);
-                showError('নেটওয়ার্ক ত্রুটি। অনুগ্রহ করে আবার চেষ্টা করুন');
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = `
-                    <div class="flex items-center justify-center">
-                        <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/>
-                            <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"/>
-                        </svg>
-                        অফলাইন পেমেন্ট নিশ্চিত করুন
-                    </div>
-                `;
-            }
-        });
-    }
-
-    // Helper Functions
-    function showError(message) {
-        errorText.textContent = message;
-        errorMessage.classList.remove('hidden');
-        errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-
-    function resetForm(submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = `
-            <div class="flex items-center justify-center">
-                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                bKash পেমেন্ট করুন - ৳ {{ number_format($invoice->amount, 2) }}
-            </div>
-        `;
-    }
+    bKash.reconfigure();
+    bKash.create();
 });
-</script>
+</script> --}}
 @endpush
+
 
 @endsection
