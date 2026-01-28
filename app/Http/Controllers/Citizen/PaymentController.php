@@ -21,44 +21,68 @@ class PaymentController extends Controller
         return view('citizen.payment', compact('invoice'));
     }
 
-    public function initiatePayment(Invoice $invoice)
+    // public function initiatePayment(Invoice $invoice)
+    // {
+    //     if (auth()->id() !== $invoice->user_id) {
+    //         abort(403);
+    //     }
+
+    //     try {
+    //         // Prepare request payload
+    //         $request_data = [
+    //             'amount'  => $invoice->amount,
+    //             'intent'  => 'sale',
+    //             'invoice' => $invoice->invoice_no,
+    //         ];
+
+    //         // 🔹 Initiate bKash Payment
+    //         $response = BkashPayment::cPayment(json_encode($request_data));
+
+    //         if (!isset($response['bkashURL'])) {
+    //             Log::error('bKash cPayment failed', $response);
+    //             return back()->with('error', 'bKash পেমেন্ট শুরু করা যায়নি');
+    //         }
+
+    //         // Save transaction
+    //         BkashTransaction::create([
+    //             'invoice_id'      => $invoice->id,
+    //             'payment_id'      => $response['paymentID'] ?? null,
+    //             'amount'          => $invoice->amount,
+    //             'currency'        => 'BDT',
+    //             'status'          => 'pending',
+    //             'request_payload' => json_encode($request_data),
+    //         ]);
+
+    //         // Redirect to bKash checkout
+    //         return redirect()->away($response['bkashURL']);
+
+    //     } catch (\Exception $e) {
+    //         Log::error('bKash initiate error', ['msg' => $e->getMessage()]);
+    //         return back()->with('error', $e->getMessage());
+    //     }
+    // }
+
+
+    public function initiatePayment(Request $request, Invoice $invoice)
     {
-        if (auth()->id() !== $invoice->user_id) {
-            abort(403);
-        }
+        // dd($request->all());
+        // Optional: validate input if needed
+        // $request->validate(['mobile' => 'required|regex:/^01[3-9]\d{8}$/']);
 
         try {
-            // Prepare request payload
-            $request_data = [
-                'amount'  => $invoice->amount,
-                'intent'  => 'sale',
-                'invoice' => $invoice->invoice_no,
-            ];
+            // 1️⃣ Call bKash API to initiate payment
+            // For demo, let's simulate a redirect URL:
+            $redirectUrl = 'https://bKash.com/payment?invoice=' . $invoice->id;
 
-            // 🔹 Initiate bKash Payment
-            $response = BkashPayment::cPayment(json_encode($request_data));
-
-            if (!isset($response['bkashURL'])) {
-                Log::error('bKash cPayment failed', $response);
-                return back()->with('error', 'bKash পেমেন্ট শুরু করা যায়নি');
-            }
-
-            // Save transaction
-            BkashTransaction::create([
-                'invoice_id'      => $invoice->id,
-                'payment_id'      => $response['paymentID'] ?? null,
-                'amount'          => $invoice->amount,
-                'currency'        => 'BDT',
-                'status'          => 'pending',
-                'request_payload' => json_encode($request_data),
+            return response()->json([
+                'success' => true,
+                'redirect_url' => $redirectUrl
             ]);
-
-            // Redirect to bKash checkout
-            return redirect()->away($response['bkashURL']);
-
         } catch (\Exception $e) {
-            Log::error('bKash initiate error', ['msg' => $e->getMessage()]);
-            return back()->with('error', $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ]);
         }
     }
 
