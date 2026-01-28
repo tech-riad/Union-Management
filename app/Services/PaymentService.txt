@@ -1,0 +1,126 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Invoice;
+use App\Models\PaymentTransaction;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+
+class PaymentService
+{
+    protected $gateway;
+    protected $config;
+    
+    public function __construct($gateway = null)
+    {
+        $this->gateway = $gateway ?? config('payment.default_gateway');
+        $this->config = config("payment.gateways.{$this->gateway}");
+    }
+    
+    /**
+     * পেমেন্ট ইনিশিয়েট করুন
+     */
+    public function initiatePayment(Invoice $invoice, $mobile = null, $email = null)
+    {
+        try {
+            Log::info('Initiating payment', [
+                'gateway' => $this->gateway,
+                'invoice_id' => $invoice->id,
+                'amount' => $invoice->amount,
+            ]);
+            
+            if ($this->gateway === 'bkash') {
+                $bkashService = new BkashService();
+                return $bkashService->initiatePayment($invoice, $mobile);
+            }
+            
+            if ($this->gateway === 'amarpay') {
+                return $this->initiateAmarpay($invoice, $mobile, $email);
+            }
+            
+            throw new \Exception("Payment gateway {$this->gateway} not supported");
+            
+        } catch (\Exception $e) {
+            Log::error('Payment initiation failed', [
+                'gateway' => $this->gateway,
+                'invoice_id' => $invoice->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw $e;
+        }
+    }
+    
+    /**
+     * AmarPay পেমেন্ট ইনিশিয়েট
+     */
+    protected function initiateAmarpay(Invoice $invoice, $mobile = null, $email = null)
+    {
+        // আপনার আগের AmarPay কোড এখানে রাখুন
+        // ...
+        
+        return [
+            'success' => true,
+            'payment_url' => 'https://example.com',
+            'message' => 'AmarPay payment initiated',
+        ];
+    }
+    
+    /**
+     * পেমেন্ট ভেরিফাই করুন
+     */
+    public function verifyPayment($transactionId, $gatewayTransactionId = null)
+    {
+        try {
+            $transaction = PaymentTransaction::where('transaction_id', $transactionId)->first();
+            
+            if (!$transaction) {
+                throw new \Exception('Transaction not found');
+            }
+            
+            if ($transaction->gateway === 'bkash') {
+                $bkashService = new BkashService();
+                return $bkashService->verifyPayment($transactionId, $gatewayTransactionId);
+            }
+            
+            if ($transaction->gateway === 'amarpay') {
+                return $this->verifyAmarpay($transactionId, $gatewayTransactionId);
+            }
+            
+            throw new \Exception("Payment gateway {$transaction->gateway} not supported");
+            
+        } catch (\Exception $e) {
+            Log::error('Payment verification failed', [
+                'transaction_id' => $transactionId,
+                'error' => $e->getMessage(),
+            ]);
+            return false;
+        }
+    }
+    
+    /**
+     * সক্রিয় পেমেন্ট গেটওয়ে লিস্ট
+     */
+    public static function getActiveGateways()
+    {
+        try {
+            $gateways = config('payment.gateways', []);
+            $active = [];
+            
+            foreach ($gateways as $key => $gateway) {
+                if ($gateway['active'] ?? false) {
+                    $active[$key] = $gateway;
+                }
+            }
+            
+            return $active;
+            
+        } catch (\Exception $e) {
+            Log::error('Error getting active gateways', [
+                'error' => $e->getMessage(),
+            ]);
+            return [];
+        }
+    }
+}

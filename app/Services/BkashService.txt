@@ -1,0 +1,409 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Invoice;
+use App\Models\PaymentTransaction;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
+
+class BkashService
+{
+    protected $config;
+    protected $isSandbox;
+    protected $appKey;
+    protected $appSecret;
+    protected $username;
+    protected $password;
+    protected $baseUrl;
+    
+    public function __construct()
+    {
+        $this->config = config('payment.gateways.bkash');
+        $this->isSandbox = $this->config['sandbox'] ?? true;
+        
+        $credentials = $this->isSandbox ? 
+            $this->config['sandbox_credentials'] : 
+            $this->config['live_credentials'];
+            
+        $this->appKey = $credentials['app_key'];
+        $this->appSecret = $credentials['app_secret'];
+        $this->username = $credentials['username'];
+        $this->password = $credentials['password'];
+        $this->baseUrl = $this->isSandbox ? 
+            $this->config['sandbox_url'] : 
+            $this->config['live_url'];
+    }
+    
+    /**
+     * bKash টোকেন প্রাপ্তি
+     */
+    public function getToken()
+    {
+        $cacheKey = 'bkash_token_' . ($this->isSandbox ? 'sandbox' : 'live');
+        
+        // Cache থেকে টোকেন পাওয়ার চেষ্টা করুন
+        if (Cache::has($cacheKey)) {
+            return Cache::get($cacheKey);
+        }
+        
+        try {
+            Log::info('Requesting bKash token', [
+                'url' => $this->baseUrl . '/checkout/token/grant',
+                'app_key' => $this->appKey,
+            ]);
+            
+            $client = new \GuzzleHttp\Client();
+            
+            $response = $client->post($this->baseUrl . '/checkout/token/grant', [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'username' => $this->username,
+                    'password' => $this->password,
+                ],
+                'json' => [
+                    'app_key' => $this->appKey,
+                    'app_secret' => $this->appSecret,
+                ],
+                'timeout' => 30,
+                'verify' => false, // SSL verification disable (sandbox এ সমস্যা হলে)
+            ]);
+            
+            $data = json_decode($response->getBody(), true);
+            
+            if (isset($data['id_token'])) {
+                $token = $data['id_token'];
+                $expiresIn = $data['expires_in'] ?? 3600;
+                
+                // Cache এ টোকেন সংরক্ষণ করুন
+                Cache::put($cacheKey, $token, $expiresIn - 300); // 5 minutes আগে expire হবে
+                
+                Log::info('bKash token obtained', [
+                    'token' => substr($token, 0, 20) . '...',
+                    'expires_in' => $expiresIn,
+                ]);
+                
+                return $token;
+            }
+            
+            Log::error('bKash token response missing id_token', $data);
+            return null;
+            
+        } catch (\Exception $e) {
+            Log::error('bKash token error', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return null;
+        }
+    }
+    
+    /**
+     * পেমেন্ট তৈরি করুন
+     */
+    public function createPayment(Invoice $invoice, $transactionId)
+    {
+        try {
+            $token = $this->getToken();
+            
+            if (!$token) {
+                throw new \Exception('Failed to get bKash token');
+            }
+            
+            $paymentData = [
+                'amount' => number_format($invoice->amount, 2, '.', ''),
+                'currency' => 'BDT',
+                'intent' => 'sale',
+                'merchantInvoiceNumber' => $invoice->invoice_no,
+                'callbackURL' => $this->config['callback_url'] . '?transaction=' . $transactionId,
+            ];
+            
+            Log::info('Creating bKash payment', [
+                'url' => $this->baseUrl . '/checkout/payment/create',
+                'data' => $paymentData,
+            ]);
+            
+            $client = new \GuzzleHttp\Client();
+            
+            $response = $client->post($this->baseUrl . '/checkout/payment/create', [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => $token,
+                    'X-APP-Key' => $this->appKey,
+                ],
+                'json' => $paymentData,
+                'timeout' => 30,
+                'verify' => false,
+            ]);
+            
+            $data = json_decode($response->getBody(), true);
+            
+            Log::info('bKash payment creation response', $data);
+            
+            return $data;
+            
+        } catch (\Exception $e) {
+            Log::error('bKash payment creation error', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw $e;
+        }
+    }
+    
+    /**
+     * পেমেন্ট execute করুন
+     */
+    public function executePayment($paymentId)
+    {
+        try {
+            $token = $this->getToken();
+            
+            if (!$token) {
+                throw new \Exception('Failed to get bKash token');
+            }
+            
+            $client = new \GuzzleHttp\Client();
+            
+            $response = $client->post($this->baseUrl . '/checkout/payment/execute/' . $paymentId, [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => $token,
+                    'X-APP-Key' => $this->appKey,
+                ],
+                'timeout' => 30,
+                'verify' => false,
+            ]);
+            
+            $data = json_decode($response->getBody(), true);
+            
+            Log::info('bKash payment execution response', $data);
+            
+            return $data;
+            
+        } catch (\Exception $e) {
+            Log::error('bKash payment execution error', [
+                'message' => $e->getMessage(),
+                'payment_id' => $paymentId,
+            ]);
+            throw $e;
+        }
+    }
+    
+    /**
+     * পেমেন্ট query করুন
+     */
+    public function queryPayment($paymentId)
+    {
+        try {
+            $token = $this->getToken();
+            
+            if (!$token) {
+                throw new \Exception('Failed to get bKash token');
+            }
+            
+            $client = new \GuzzleHttp\Client();
+            
+            $response = $client->get($this->baseUrl . '/checkout/payment/query/' . $paymentId, [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => $token,
+                    'X-APP-Key' => $this->appKey,
+                ],
+                'timeout' => 30,
+                'verify' => false,
+            ]);
+            
+            $data = json_decode($response->getBody(), true);
+            
+            Log::info('bKash payment query response', $data);
+            
+            return $data;
+            
+        } catch (\Exception $e) {
+            Log::error('bKash payment query error', [
+                'message' => $e->getMessage(),
+                'payment_id' => $paymentId,
+            ]);
+            throw $e;
+        }
+    }
+    
+    /**
+     * পেমেন্ট refund করুন
+     */
+    public function refundPayment($paymentId, $amount, $trxId, $sku = 'Payment refund', $reason = 'Refund')
+    {
+        try {
+            $token = $this->getToken();
+            
+            if (!$token) {
+                throw new \Exception('Failed to get bKash token');
+            }
+            
+            $refundData = [
+                'paymentID' => $paymentId,
+                'amount' => $amount,
+                'trxID' => $trxId,
+                'sku' => $sku,
+                'reason' => $reason,
+            ];
+            
+            $client = new \GuzzleHttp\Client();
+            
+            $response = $client->post($this->baseUrl . '/checkout/payment/refund', [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => $token,
+                    'X-APP-Key' => $this->appKey,
+                ],
+                'json' => $refundData,
+                'timeout' => 30,
+                'verify' => false,
+            ]);
+            
+            $data = json_decode($response->getBody(), true);
+            
+            Log::info('bKash payment refund response', $data);
+            
+            return $data;
+            
+        } catch (\Exception $e) {
+            Log::error('bKash payment refund error', [
+                'message' => $e->getMessage(),
+                'payment_id' => $paymentId,
+            ]);
+            throw $e;
+        }
+    }
+    
+    /**
+     * সরাসরি পেমেন্ট শুরু করুন
+     */
+    public function initiatePayment(Invoice $invoice, $mobile = null)
+    {
+        try {
+            // Transaction তৈরি করুন
+            $transaction = PaymentTransaction::create([
+                'invoice_id' => $invoice->id,
+                'user_id' => $invoice->user_id,
+                'gateway' => 'bkash',
+                'amount' => $invoice->amount,
+                'transaction_id' => 'BKTX' . time() . Str::random(6),
+                'status' => 'initiated',
+                'payload' => [
+                    'mobile' => $mobile,
+                    'invoice_no' => $invoice->invoice_no,
+                ]
+            ]);
+            
+            // bKash payment তৈরি করুন
+            $paymentResponse = $this->createPayment($invoice, $transaction->transaction_id);
+            
+            if (isset($paymentResponse['paymentID']) && isset($paymentResponse['bkashURL'])) {
+                // Transaction আপডেট করুন
+                $transaction->update([
+                    'gateway_transaction_id' => $paymentResponse['paymentID'],
+                    'gateway_response' => $paymentResponse,
+                    'status' => 'pending',
+                ]);
+                
+                // Invoice আপডেট করুন
+                $invoice->update([
+                    'payment_gateway' => 'bkash',
+                    'transaction_id' => $transaction->transaction_id,
+                    'payment_details' => [
+                        'init_response' => $paymentResponse,
+                        'mobile' => $mobile,
+                        'transaction_record' => $transaction->id,
+                    ]
+                ]);
+                
+                return [
+                    'success' => true,
+                    'paymentID' => $paymentResponse['paymentID'],
+                    'bkashURL' => $paymentResponse['bkashURL'],
+                    'transactionStatus' => $paymentResponse['transactionStatus'] ?? 'Initiated',
+                    'transaction_id' => $transaction->transaction_id,
+                    'message' => 'bKash payment initiated successfully',
+                ];
+            } else {
+                $transaction->update([
+                    'status' => 'failed',
+                    'gateway_response' => $paymentResponse,
+                ]);
+                
+                $errorMessage = $paymentResponse['errorMessage'] ?? 
+                               $paymentResponse['statusMessage'] ?? 
+                               'Unknown error';
+                               
+                throw new \Exception('bKash payment initiation failed: ' . $errorMessage);
+            }
+            
+        } catch (\Exception $e) {
+            Log::error('bKash payment initiation error', [
+                'message' => $e->getMessage(),
+                'invoice_id' => $invoice->id,
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw $e;
+        }
+    }
+    
+    /**
+     * পেমেন্ট ভেরিফাই করুন
+     */
+    public function verifyPayment($transactionId, $paymentId)
+    {
+        try {
+            $transaction = PaymentTransaction::where('transaction_id', $transactionId)->first();
+            
+            if (!$transaction) {
+                throw new \Exception('Transaction not found');
+            }
+            
+            // Payment execute করুন
+            $paymentData = $this->executePayment($paymentId);
+            
+            if (isset($paymentData['transactionStatus']) && $paymentData['transactionStatus'] === 'Completed') {
+                $transaction->update([
+                    'status' => 'completed',
+                    'completed_at' => now(),
+                    'gateway_response' => array_merge($transaction->gateway_response ?? [], ['execute_response' => $paymentData]),
+                ]);
+                
+                // Invoice আপডেট করুন
+                $transaction->invoice->update([
+                    'payment_status' => 'paid',
+                    'payment_method' => 'bkash',
+                    'paid_at' => now(),
+                    'transaction_id' => $paymentData['trxID'] ?? $paymentId,
+                ]);
+                
+                return [
+                    'success' => true,
+                    'transaction_id' => $paymentData['trxID'] ?? $paymentId,
+                    'amount' => $paymentData['amount'] ?? $transaction->amount,
+                    'invoice_no' => $paymentData['merchantInvoiceNumber'] ?? $transaction->invoice->invoice_no,
+                    'payment_date' => $paymentData['paymentExecuteTime'] ?? now(),
+                    'payer' => $paymentData['customerMsisdn'] ?? 'N/A',
+                ];
+            }
+            
+            return [
+                'success' => false,
+                'message' => 'Payment not completed',
+                'payment_data' => $paymentData,
+            ];
+            
+        } catch (\Exception $e) {
+            Log::error('bKash payment verification error', [
+                'message' => $e->getMessage(),
+                'transaction_id' => $transactionId,
+            ]);
+            throw $e;
+        }
+    }
+}
