@@ -7,16 +7,16 @@ use App\Helpers\UnionHelper;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>@yield('title', UnionHelper::getName())</title>
-
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-
+    
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
+    
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-
+    
     <!-- Dynamic Styles Based on Settings -->
     <style id="dynamic-styles">
         :root {
@@ -32,7 +32,7 @@ use App\Helpers\UnionHelper;
             --gradient-primary: linear-gradient(135deg, {{ UnionHelper::getPrimaryColor() }} 0%, {{ UnionHelper::adjustColor(UnionHelper::getPrimaryColor(), 20) }} 100%);
             --gradient-secondary: linear-gradient(135deg, {{ UnionHelper::getSecondaryColor() }} 0%, {{ UnionHelper::adjustColor(UnionHelper::getSecondaryColor(), 20) }} 100%);
             --gradient-accent: linear-gradient(135deg, #f59e0b 0%, #ec4899 100%);
-
+            
             /* RGB Variables for rgba() usage */
             --primary-rgb: {{ UnionHelper::hexToRgb(UnionHelper::getPrimaryColor()) }};
             --primary-light-rgb: {{ UnionHelper::hexToRgb(UnionHelper::adjustColor(UnionHelper::getPrimaryColor(), 40)) }};
@@ -61,7 +61,7 @@ use App\Helpers\UnionHelper;
             display: flex;
             flex-direction: column;
         }
-
+        
         body::before {
             content: '';
             position: fixed;
@@ -74,7 +74,7 @@ use App\Helpers\UnionHelper;
             pointer-events: none;
         }
     </style>
-
+    
     <!-- Custom Styles -->
     <style>
         /* Responsive Typography */
@@ -95,7 +95,7 @@ use App\Helpers\UnionHelper;
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow:
+            box-shadow: 
                 0 8px 32px rgba(31, 38, 135, 0.1),
                 0 4px 16px rgba(0, 0, 0, 0.05);
         }
@@ -157,7 +157,7 @@ use App\Helpers\UnionHelper;
                 left: 0.75rem;
                 bottom: 0.75rem;
             }
-
+            
             .floating-widget-container.hide-top {
                 transform: translateY(-50px);
             }
@@ -360,11 +360,11 @@ use App\Helpers\UnionHelper;
                 width: 260px;
                 right: 3.5rem;
             }
-
+            
             .quick-action-item {
                 padding: 0.625rem;
             }
-
+            
             .quick-action-icon {
                 width: 2.25rem;
                 height: 2.25rem;
@@ -426,25 +426,25 @@ use App\Helpers\UnionHelper;
             margin-bottom: 0.25rem;
             text-decoration: none;
         }
-
+        
         .mobile-nav-item:hover,
         .mobile-nav-item.active {
             background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.1), rgba(var(--primary-light-rgb), 0.1));
             color: var(--primary);
         }
-
+        
         .mobile-nav-item.active {
             background: var(--gradient-primary);
             color: white;
             box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
         }
-
+        
         .mobile-nav-item i {
             width: 1.5rem;
             text-align: center;
             font-size: 1rem;
         }
-
+        
         .badge {
             background-color: rgba(var(--primary-rgb), 0.1);
             color: var(--primary);
@@ -453,7 +453,7 @@ use App\Helpers\UnionHelper;
             border-radius: 9999px;
             font-weight: 500;
         }
-
+        
         .dropdown-item {
             display: flex;
             align-items: center;
@@ -463,18 +463,18 @@ use App\Helpers\UnionHelper;
             transition: all 0.3s;
             text-decoration: none;
         }
-
+        
         .dropdown-item:hover {
             background-color: #f3f4f6;
         }
-
+        
         .dropdown-item i {
             width: 1.25rem;
             text-align: center;
             margin-right: 0.75rem;
             font-size: 0.875rem;
         }
-
+        
         .footer-link {
             display: flex;
             align-items: center;
@@ -484,7 +484,7 @@ use App\Helpers\UnionHelper;
             padding: 0.25rem 0;
             text-decoration: none;
         }
-
+        
         .footer-link:hover {
             color: var(--primary);
         }
@@ -507,7 +507,7 @@ use App\Helpers\UnionHelper;
                 white-space: nowrap;
                 -webkit-overflow-scrolling: touch;
             }
-
+            
             td, th {
                 padding: 0.75rem 0.5rem !important;
             }
@@ -556,10 +556,10 @@ use App\Helpers\UnionHelper;
             }
         }
     </script>
-
+    
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
+    
     @stack('styles')
 </head>
 <body class="font-bangla">
@@ -571,7 +571,7 @@ use App\Helpers\UnionHelper;
                 <div class="flex items-center space-x-3">
                     <div class="relative">
                         @if(UnionHelper::getLogoUrl() && UnionHelper::getLogoUrl() != asset('images/default-logo.png'))
-                            <img src="{{ UnionHelper::getLogoUrl() }}"
+                            <img src="{{ UnionHelper::getLogoUrl() }}" 
                                  alt="{{ UnionHelper::getName() }}"
                                  class="w-10 h-10 rounded-xl object-cover shadow-lg">
                             <div class="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white"></div>
@@ -591,33 +591,33 @@ use App\Helpers\UnionHelper;
                 <!-- Desktop Navigation -->
                 <div class="hidden md:flex items-center space-x-1">
                     <div class="flex items-center space-x-1 bg-gray-100/50 rounded-xl p-1">
-                        <a href="{{ route('citizen.dashboard') }}"
+                        <a href="{{ route('citizen.dashboard') }}" 
                            class="nav-link {{ request()->routeIs('citizen.dashboard') ? 'active' : '' }}">
                             <i class="fas fa-home text-sm"></i>
                             <span class="hidden lg:inline">ড্যাশবোর্ড</span>
                             <div class="notification-dot"></div>
                         </a>
-
-                        <a href="{{ route('citizen.applications.index') }}"
+                        
+                        <a href="{{ route('citizen.applications.index') }}" 
                            class="nav-link {{ request()->routeIs('citizen.applications.*') ? 'active' : '' }}">
                             <i class="fas fa-file-alt text-sm"></i>
                             <span class="hidden lg:inline">আবেদন</span>
                             <span class="ml-2 bg-primary-100 text-primary-600 text-xs px-2 py-0.5 rounded-full">5</span>
                         </a>
-
-                        <a href="{{ route('citizen.invoices.index') }}"
+                        
+                        <a href="{{ route('citizen.invoices.index') }}" 
                            class="nav-link {{ request()->routeIs('citizen.invoices.*') ? 'active' : '' }}">
                             <i class="fas fa-receipt text-sm"></i>
                             <span class="hidden lg:inline">ইনভয়েস</span>
                         </a>
-
-                        <a href="{{ route('citizen.profile.show') }}"
+                        
+                        <a href="{{ route('citizen.profile.show') }}" 
                            class="nav-link {{ request()->routeIs('citizen.profile.*') ? 'active' : '' }}">
                             <i class="fas fa-user text-sm"></i>
                             <span class="hidden lg:inline">প্রোফাইল</span>
                         </a>
                     </div>
-
+                    
                     <!-- User Menu -->
                     <div class="relative group ml-4">
                         <button class="flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-gray-50 to-white border border-gray-200 hover:border-primary-200 transition-all duration-300">
@@ -630,7 +630,7 @@ use App\Helpers\UnionHelper;
                             </div>
                             <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
                         </button>
-
+                        
                         <!-- Dropdown Menu -->
                         <div class="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform -translate-y-2 group-hover:translate-y-0 z-50">
                             <div class="p-2">
@@ -645,7 +645,7 @@ use App\Helpers\UnionHelper;
                                         </div>
                                     </div>
                                 </div>
-
+                                
                                 <div class="py-2">
                                     <a href="{{ route('citizen.profile.show') }}" class="dropdown-item">
                                         <i class="fas fa-user-circle text-gray-400"></i>
@@ -672,7 +672,7 @@ use App\Helpers\UnionHelper;
                             </div>
                         </div>
                     </div>
-
+                    
                     <!-- Notification Bell -->
                     <button class="relative w-10 h-10 rounded-xl bg-gray-100/50 flex items-center justify-center hover:bg-gray-200/50 transition">
                         <i class="fas fa-bell text-gray-600"></i>
@@ -699,7 +699,7 @@ use App\Helpers\UnionHelper;
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center space-x-3">
                         @if(UnionHelper::getLogoUrl() && UnionHelper::getLogoUrl() != asset('images/default-logo.png'))
-                            <img src="{{ UnionHelper::getLogoUrl() }}"
+                            <img src="{{ UnionHelper::getLogoUrl() }}" 
                                  alt="{{ UnionHelper::getName() }}"
                                  class="w-10 h-10 rounded-xl object-cover">
                         @else
@@ -716,36 +716,36 @@ use App\Helpers\UnionHelper;
                         <i class="fas fa-times text-gray-600"></i>
                     </button>
                 </div>
-
+                
                 <!-- Mobile Menu Items -->
                 <div class="flex-1 space-y-1 overflow-y-auto">
-                    <a href="{{ route('citizen.dashboard') }}"
+                    <a href="{{ route('citizen.dashboard') }}" 
                        class="mobile-nav-item {{ request()->routeIs('citizen.dashboard') ? 'active' : '' }}">
                         <i class="fas fa-home"></i>
                         <span>ড্যাশবোর্ড</span>
                         <div class="notification-dot"></div>
                     </a>
-
-                    <a href="{{ route('citizen.applications.index') }}"
+                    
+                    <a href="{{ route('citizen.applications.index') }}" 
                        class="mobile-nav-item {{ request()->routeIs('citizen.applications.*') ? 'active' : '' }}">
                         <i class="fas fa-file-alt"></i>
                         <span>আবেদনসমূহ</span>
                         <span class="badge">5</span>
                     </a>
-
-                    <a href="{{ route('citizen.invoices.index') }}"
+                    
+                    <a href="{{ route('citizen.invoices.index') }}" 
                        class="mobile-nav-item {{ request()->routeIs('citizen.invoices.*') ? 'active' : '' }}">
                         <i class="fas fa-receipt"></i>
                         <span>ইনভয়েস</span>
                     </a>
-
-                    <a href="{{ route('citizen.profile.show') }}"
+                    
+                    <a href="{{ route('citizen.profile.show') }}" 
                        class="mobile-nav-item {{ request()->routeIs('citizen.profile.*') ? 'active' : '' }}">
                         <i class="fas fa-user"></i>
                         <span>প্রোফাইল</span>
                     </a>
                 </div>
-
+                
                 <!-- Mobile User Info -->
                 <div class="pt-4 border-t">
                     <div class="flex items-center space-x-3 mb-4">
@@ -757,7 +757,7 @@ use App\Helpers\UnionHelper;
                             <p class="text-sm text-gray-500 truncate">{{ Auth::user()->email }}</p>
                         </div>
                     </div>
-
+                    
                     <div class="space-y-2">
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
@@ -852,11 +852,11 @@ use App\Helpers\UnionHelper;
             <i class="fas fa-bolt"></i>
             <span class="widget-tooltip">দ্রুত কাজ</span>
             <div class="notification-dot"></div>
-
+            
             <!-- Quick Actions Menu -->
             <div class="quick-actions-menu" id="quickActionsMenu">
                 <div class="quick-actions-header">দ্রুত কাজ</div>
-
+                
                 <a href="{{ route('citizen.certificates.index') }}" class="quick-action-item">
                     <div class="quick-action-icon bg-blue-100">
                         <i class="fas fa-plus text-blue-600"></i>
@@ -866,7 +866,7 @@ use App\Helpers\UnionHelper;
                         <div class="quick-action-desc">সার্টিফিকেটের জন্য আবেদন করুন</div>
                     </div>
                 </a>
-
+                
                 <a href="{{ route('citizen.invoices.index') }}" class="quick-action-item">
                     <div class="quick-action-icon bg-green-100">
                         <i class="fas fa-credit-card text-green-600"></i>
@@ -876,7 +876,7 @@ use App\Helpers\UnionHelper;
                         <div class="quick-action-desc">বকেয়া পেমেন্ট পরিশোধ করুন</div>
                     </div>
                 </a>
-
+                
                 <a href="#" class="quick-action-item" onclick="downloadDocuments()">
                     <div class="quick-action-icon bg-purple-100">
                         <i class="fas fa-download text-purple-600"></i>
@@ -886,7 +886,7 @@ use App\Helpers\UnionHelper;
                         <div class="quick-action-desc">আপনার সার্টিফিকেট ডাউনলোড করুন</div>
                     </div>
                 </a>
-
+                
                 <a href="tel:{{ UnionHelper::getContactNumber() }}" class="quick-action-item">
                     <div class="quick-action-icon bg-orange-100">
                         <i class="fas fa-phone text-orange-600"></i>
@@ -921,7 +921,7 @@ use App\Helpers\UnionHelper;
                 <div class="space-y-3 md:space-y-4">
                     <div class="flex items-center space-x-3">
                         @if(UnionHelper::getLogoUrl() && UnionHelper::getLogoUrl() != asset('images/default-logo.png'))
-                            <img src="{{ UnionHelper::getLogoUrl() }}"
+                            <img src="{{ UnionHelper::getLogoUrl() }}" 
                                  alt="{{ UnionHelper::getName() }}"
                                  class="w-10 h-10 md:w-12 md:h-12 rounded-xl object-cover">
                         @else
@@ -1022,7 +1022,7 @@ use App\Helpers\UnionHelper;
                             ভার্সন ২.১.০ • ডিজিটাল বাংলাদেশের জন্য তৈরি
                         </p>
                     </div>
-
+                    
                     <div class="flex items-center space-x-3 md:space-x-4">
                         @php
                             $socialLinks = UnionHelper::getSocialLinks();
@@ -1067,7 +1067,7 @@ use App\Helpers\UnionHelper;
         // DOM Ready
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Premium Union Platform Loaded');
-
+            
             // Initialize all components
             initFloatingWidgets();
             initMobileMenu();
@@ -1076,7 +1076,7 @@ use App\Helpers\UnionHelper;
             initMessages();
             initFormLoading();
             initTouchSupport();
-
+            
             // Protect body styles from being changed
             protectBodyStyles();
         });
@@ -1085,7 +1085,7 @@ use App\Helpers\UnionHelper;
         function protectBodyStyles() {
             const fixedStyles = document.getElementById('dynamic-styles');
             const originalBodyStyles = fixedStyles.innerHTML;
-
+            
             // Monitor for style changes
             const observer = new MutationObserver(function(mutations) {
                 mutations.forEach(function(mutation) {
@@ -1098,7 +1098,7 @@ use App\Helpers\UnionHelper;
                     }
                 });
             });
-
+            
             // Start observing
             observer.observe(fixedStyles, {
                 attributes: true,
@@ -1106,11 +1106,11 @@ use App\Helpers\UnionHelper;
                 characterData: true,
                 subtree: true
             });
-
+            
             // Also protect the body element itself
             const bodyElement = document.body;
             const originalBodyClass = bodyElement.className;
-
+            
             setInterval(function() {
                 if (bodyElement.className !== originalBodyClass) {
                     console.warn('Body class being modified. Reverting...');
@@ -1136,10 +1136,10 @@ use App\Helpers\UnionHelper;
 
             function checkScrollPosition() {
                 const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-
+                
                 // Check if at top of page
                 isAtTop = scrollTop < 100;
-
+                
                 // Update widget container class
                 if (isAtTop) {
                     floatingWidgets.classList.add('hide-top');
@@ -1148,7 +1148,7 @@ use App\Helpers\UnionHelper;
                     floatingWidgets.classList.remove('hide-top');
                     floatingWidgets.classList.add('show-all');
                 }
-
+                
                 // Show/hide back to top widget based on scroll position
                 if (scrollTop > 300) {
                     backToTopWidget.style.opacity = '1';
@@ -1159,7 +1159,7 @@ use App\Helpers\UnionHelper;
                     backToTopWidget.style.visibility = 'hidden';
                     backToTopWidget.style.transform = 'translateY(10px)';
                 }
-
+                
                 lastScrollTop = scrollTop;
             }
         }
@@ -1174,7 +1174,7 @@ use App\Helpers\UnionHelper;
             quickActionsWidget.addEventListener('click', function(e) {
                 e.stopPropagation();
                 isMenuOpen = !isMenuOpen;
-
+                
                 if (isMenuOpen) {
                     quickActionsMenu.classList.add('show');
                 } else {
@@ -1202,7 +1202,7 @@ use App\Helpers\UnionHelper;
         // Back to Top Functionality
         function initBackToTop() {
             const backToTopWidget = document.getElementById('backToTopWidget');
-
+            
             backToTopWidget.addEventListener('click', function() {
                 window.scrollTo({
                     top: 0,
@@ -1223,7 +1223,7 @@ use App\Helpers\UnionHelper;
         function downloadDocuments() {
             // Show loading
             document.getElementById('loadingOverlay').classList.remove('hidden');
-
+            
             // Simulate download process
             setTimeout(() => {
                 document.getElementById('loadingOverlay').classList.add('hidden');
@@ -1237,46 +1237,46 @@ use App\Helpers\UnionHelper;
             const closeButton = document.getElementById('closeMobileMenu');
             const mobileMenu = document.getElementById('mobileMenu');
             const mobileMenuBackdrop = document.getElementById('mobileMenuBackdrop');
-
+            
             if (!menuButton || !mobileMenu) return;
-
+            
             // Function to open mobile menu
             function openMobileMenu() {
                 mobileMenu.classList.remove('hidden');
                 document.body.style.overflow = 'hidden';
-
+                
                 // Add a small delay for smooth animation
                 setTimeout(() => {
                     mobileMenu.querySelector('.absolute.right-0').classList.remove('translate-x-full');
                 }, 10);
             }
-
+            
             // Function to close mobile menu
             function closeMobileMenu() {
                 mobileMenu.querySelector('.absolute.right-0').classList.add('translate-x-full');
-
+                
                 setTimeout(() => {
                     mobileMenu.classList.add('hidden');
                     document.body.style.overflow = 'auto';
                 }, 300);
             }
-
+            
             // Open menu when hamburger button is clicked
             menuButton.addEventListener('click', openMobileMenu);
-
+            
             // Close menu when X button is clicked
             closeButton.addEventListener('click', closeMobileMenu);
-
+            
             // Close menu when backdrop is clicked
             mobileMenuBackdrop.addEventListener('click', closeMobileMenu);
-
+            
             // Close menu on escape key
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape' && !mobileMenu.classList.contains('hidden')) {
                     closeMobileMenu();
                 }
             });
-
+            
             // Close menu when clicking on menu items
             document.querySelectorAll('.mobile-nav-item').forEach(item => {
                 item.addEventListener('click', function() {
@@ -1288,13 +1288,13 @@ use App\Helpers\UnionHelper;
         // Auto-hide Messages
         function initMessages() {
             const messages = document.querySelectorAll('.bg-gradient-to-r');
-
+            
             messages.forEach(message => {
                 setTimeout(() => {
                     message.style.transition = 'opacity 0.5s, transform 0.5s';
                     message.style.opacity = '0';
                     message.style.transform = 'translateY(-20px)';
-
+                    
                     setTimeout(() => {
                         if (message.parentNode) {
                             message.remove();
@@ -1307,7 +1307,7 @@ use App\Helpers\UnionHelper;
         // Form Loading Overlay
         function initFormLoading() {
             const forms = document.querySelectorAll('form');
-
+            
             forms.forEach(form => {
                 form.addEventListener('submit', function(e) {
                     if (!form.classList.contains('ajax-form')) {
@@ -1315,7 +1315,7 @@ use App\Helpers\UnionHelper;
                     }
                 });
             });
-
+            
             window.addEventListener('load', function() {
                 document.getElementById('loadingOverlay').classList.add('hidden');
             });
@@ -1338,7 +1338,7 @@ use App\Helpers\UnionHelper;
                 widget.addEventListener('touchstart', function() {
                     this.style.transform = 'scale(0.95)';
                 });
-
+                
                 widget.addEventListener('touchend', function() {
                     this.style.transform = '';
                 });
@@ -1353,43 +1353,43 @@ use App\Helpers\UnionHelper;
                 transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 transform: translateX(100%);
             }
-
+            
             #mobileMenu .absolute.right-0:not(.translate-x-full) {
                 transform: translateX(0);
             }
-
+            
             /* Floating widgets adjustment when menu is open */
             #mobileMenu:not(.hidden) ~ .floating-widget-container {
                 opacity: 0.5;
                 pointer-events: none;
             }
-
+            
             @media (max-width: 768px) {
                 .floating-widget-container {
                     gap: 0.5rem;
                 }
-
+                
                 .quick-actions-menu {
                     width: calc(100vw - 5rem);
                     max-width: 280px;
                 }
-
+                
                 .widget-tooltip {
                     display: none;
                 }
-
+                
                 .floating-widget:active {
                     transform: scale(0.9);
                 }
             }
-
+            
             /* Better focus styles for accessibility */
             .floating-widget:focus-visible {
                 outline: 2px solid var(--primary);
                 outline-offset: 2px;
             }
-
-            button:focus-visible,
+            
+            button:focus-visible, 
             a:focus-visible,
             input:focus-visible,
             select:focus-visible,
@@ -1401,7 +1401,7 @@ use App\Helpers\UnionHelper;
         `;
         document.head.appendChild(style);
     </script>
-
+    
     @stack('scripts')
 </body>
 </html>
