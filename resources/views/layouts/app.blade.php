@@ -1074,7 +1074,7 @@ use App\Helpers\UnionHelper;
             initQuickActionsMenu();
             initBackToTop();
             initMessages();
-            // initFormLoading();
+            initFormLoading();
             initTouchSupport();
 
             // Protect body styles from being changed
