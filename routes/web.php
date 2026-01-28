@@ -109,7 +109,7 @@ Route::get('/test-bkash-direct', function () {
 Route::get('/home', function () {
     if (auth()->check()) {
         $user = auth()->user();
-        
+
         if ($user->role === 'super_admin') {
             return redirect()->route('super_admin.dashboard');
         } elseif (in_array($user->role, ['admin', 'secretary', 'citizen'])) {
@@ -121,23 +121,23 @@ Route::get('/home', function () {
 
 // ================= AUTHENTICATED ROUTES =================
 Route::middleware(['auth'])->group(function () {
-    
+
     // ================= DASHBOARDS =================
     // সুপার অ্যাডমিন ড্যাশবোর্ড - DashboardController ব্যবহার করুন
     Route::get('/super-admin/dashboard', [DashboardController::class, 'index'])
         ->middleware('role:super_admin')
         ->name('super_admin.dashboard');
-    
+
     // অ্যাডমিন ড্যাশবোর্ড
     Route::get('/admin/dashboard', fn () => view('dashboards.admin'))
         ->middleware('role:admin')
         ->name('admin.dashboard');
-    
+
     // সেক্রেটারি ড্যাশবোর্ড
     Route::get('/secretary/dashboard', fn () => view('dashboards.secretary'))
         ->middleware('role:secretary')
         ->name('secretary.dashboard');
-    
+
     // সিটিজেন ড্যাশবোর্ড
     Route::get('/citizen/dashboard', fn () => view('dashboards.citizen'))
         ->middleware('role:citizen')
@@ -160,14 +160,14 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/certificates', [CertificateApplicationController::class, 'index'])->name('certificates.index');
         Route::get('/applications', [CertificateApplicationController::class, 'index'])->name('applications.index');
         Route::get('/applications/{application}', [CertificateApplicationController::class, 'show'])->name('applications.show');
-        
+
         // সার্টিফিকেট টাইপের জন্য আবেদন ফর্ম - CertificateType মডেল ব্যবহার করুন
         Route::get('/certificates/{certificateType}/apply', [CertificateApplicationController::class, 'apply'])
             ->name('applications.apply');
         Route::post('/certificates/{certificateType}/apply', [CertificateApplicationController::class, 'store'])
             ->name('applications.store');
-        
-        Route::get('/applications/{application}/certificate-pdf', 
+
+        Route::get('/applications/{application}/certificate-pdf',
             [CertificateApplicationController::class, 'certificatePdf']
         )->name('applications.certificate.pdf');
 
@@ -182,6 +182,12 @@ Route::middleware(['auth'])->group(function () {
 
         // -------- PAYMENTS --------
         Route::prefix('payments')->name('payments.')->group(function () {
+            Route::get('grant-token/{invoice}',[PaymentController::class,'grantToken'])->name('grantToken');
+            Route::post('create-payment',[PaymentController::class,'createPayment'])->name('createPayment');
+            Route::post('execute-payment',[PaymentController::class,'executePayment'])->name('executePayment');
+
+
+
             Route::get('/{invoice}', [PaymentController::class, 'showPaymentPage'])->name('show');
             Route::post('/{invoice}/initiate', [PaymentController::class, 'initiatePayment'])->name('initiate');
             Route::post('/{invoice}/bkash', [PaymentController::class, 'directBkashPayment'])->name('bkash.direct');
@@ -191,10 +197,10 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{invoice}/success', [PaymentController::class, 'paymentSuccess'])->name('success.invoice');
             Route::get('/{invoice}/failed', [PaymentController::class, 'paymentFailed'])->name('failed.invoice');
             Route::get('/{invoice}/check-status', [PaymentController::class, 'checkStatus'])->name('check.status');
-            
+
             // পেমেন্ট হিস্টোরি
             Route::get('/payment-history', [PaymentController::class, 'paymentHistory'])->name('history');
-            
+
             // বিকাশ পেমেন্ট ক্রিয়েট রুট
             Route::post('/{invoice}/create', [PaymentController::class, 'createBkashPayment'])->name('create.invoice');
         });
@@ -210,7 +216,7 @@ Route::middleware(['auth'])->group(function () {
 
         // -------- DASHBOARD --------
         Route::get('/dashboard', fn () => view('dashboards.admin'))->name('dashboard');
-        
+
         // -------- REPORTS --------
         Route::prefix('reports')->name('reports.')->group(function () {
             Route::get('/', [ReportController::class, 'index'])->name('index');
@@ -222,7 +228,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/dashboard-stats', [ReportController::class, 'getDashboardStats'])->name('dashboard.stats');
             Route::get('/export/{type}', [ReportController::class, 'export'])->name('export');
         });
-        
+
         // -------- APPLICATIONS MANAGEMENT --------
         Route::prefix('applications')->name('applications.')->group(function () {
             Route::get('/', [ApplicationManageController::class, 'index'])->name('index');
@@ -236,25 +242,25 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/bulk-action', [ApplicationManageController::class, 'bulkAction'])->name('bulk-action');
             Route::get('/{application}/certificate-pdf', [CertificateApplicationController::class, 'certificatePdf'])->name('certificate.pdf');
         });
-        
+
         // -------- USER MANAGEMENT --------
         Route::prefix('users')->name('users.')->group(function() {
             Route::get('/', [AdminUserController::class, 'index'])->name('index');
             Route::get('/{user}', [AdminUserController::class, 'show'])->name('show');
-            
+
             Route::middleware(['check.role:admin,super_admin'])->group(function() {
                 Route::post('/', [AdminUserController::class, 'store'])->name('store');
                 Route::put('/{user}/status', [AdminUserController::class, 'updateStatus'])->name('status');
                 Route::post('/bulk-action', [AdminUserController::class, 'bulkAction'])->name('bulk-action');
                 Route::get('/export', [AdminUserController::class, 'export'])->name('export');
             });
-            
+
             Route::middleware(['check.role:super_admin'])->group(function() {
                 Route::get('/{user}/edit', [AdminUserController::class, 'edit'])->name('edit');
                 Route::put('/{user}', [AdminUserController::class, 'update'])->name('update');
             });
         });
-        
+
         // -------- BKASH MANAGEMENT --------
         Route::prefix('bkash')->name('bkash.')->group(function () {
             Route::get('/transactions', [SuperAdminBkashController::class, 'transactions'])->name('transactions.index');
@@ -266,7 +272,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/reports', [SuperAdminBkashController::class, 'reports'])->name('reports');
             Route::get('/export', [SuperAdminBkashController::class, 'exportTransactions'])->name('export');
         });
-        
+
         // -------- PAYMENT GATEWAY MANAGEMENT --------
         Route::prefix('payment-gateways')->name('payment.gateways.')->group(function () {
             Route::get('/', [SuperAdminBkashController::class, 'gatewayList'])->name('index');
@@ -274,41 +280,41 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/{gateway}/update', [SuperAdminBkashController::class, 'gatewayUpdate'])->name('update');
             Route::post('/{gateway}/toggle', [SuperAdminBkashController::class, 'gatewayToggle'])->name('toggle');
         });
-        
+
         // -------- ADMIN PROFILE ROUTES --------
         Route::prefix('profile')->name('profile.')->group(function () {
             Route::get('/', function () {
                 return view('admin.profile.show');
             })->name('index');
-            
+
             Route::get('/edit', function () {
                 return view('admin.profile.edit');
             })->name('edit');
-            
+
             Route::put('/update', function (\Illuminate\Http\Request $request) {
                 // Profile update logic
             })->name('update');
-            
+
             Route::post('/upload-image', function (\Illuminate\Http\Request $request) {
                 // Upload image logic
             })->name('upload-image');
-            
+
             Route::post('/remove-image', function () {
                 // Remove image logic
             })->name('remove-image');
         });
-        
+
         // -------- ADMIN PASSWORD CHANGE ROUTES --------
         Route::prefix('password')->name('password.')->group(function () {
             Route::get('/change', function () {
                 return view('admin.profile.change-password');
             })->name('change');
-            
+
             Route::put('/update', function (\Illuminate\Http\Request $request) {
                 // Password update logic
             })->name('update');
         });
-        
+
         // -------- SETTINGS ROUTES --------
         Route::get('/settings', function () {
             $user = auth()->user();
@@ -317,7 +323,7 @@ Route::middleware(['auth'])->group(function () {
             }
             abort(403, 'Unauthorized access.');
         })->name('settings');
-        
+
         Route::put('/settings', function (\Illuminate\Http\Request $request) {
             // Settings update logic
         })->name('settings.update');
@@ -333,7 +339,7 @@ Route::middleware(['auth'])->group(function () {
 
         // -------- DASHBOARD --------
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-        
+
         // -------- REPORTS --------
         Route::prefix('reports')->name('reports.')->group(function () {
             Route::get('/', [SuperReportController::class, 'index'])->name('index');
@@ -343,7 +349,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/admin-performance', [SuperReportController::class, 'adminPerformance'])->name('admin-performance');
             Route::get('/system-monitoring', [SuperReportController::class, 'systemMonitoring'])->name('system-monitoring');
             Route::get('/backup', [SuperReportController::class, 'backupReport'])->name('backup');
-            
+
             // Backup operations
             Route::post('/create-backup', [SuperReportController::class, 'createBackup'])->name('create-backup');
             Route::post('/upload-backup', [SuperReportController::class, 'uploadBackup'])->name('upload-backup');
@@ -352,10 +358,10 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/restore-backup', [SuperReportController::class, 'restoreBackup'])->name('restore-backup');
             Route::get('/download-backup/{filename}', [SuperReportController::class, 'downloadBackup'])->name('download-backup');
             Route::delete('/delete-backup/{filename}', [SuperReportController::class, 'deleteBackup'])->name('delete-backup');
-            
+
             // Export
             Route::get('/export/{type}', [SuperReportController::class, 'export'])->name('export');
-            
+
             // Additional Reports
             Route::get('/revenue-trend', [SuperReportController::class, 'revenueTrend'])->name('revenue-trend');
             Route::get('/user-analysis', [SuperReportController::class, 'userAnalysis'])->name('user-analysis');
@@ -363,12 +369,12 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/financial-analytics', [SuperReportController::class, 'financialAnalytics'])->name('financial-analytics');
             Route::get('/audit-trail', [SuperReportController::class, 'auditTrail'])->name('audit-trail');
         });
-        
+
         // ================= SYSTEM UPDATE ROUTES =================
         Route::prefix('system-update')->name('system_update.')->group(function () {
             // System Update Page
             Route::get('/', [SystemUpdateController::class, 'index'])->name('index');
-            
+
             // AJAX endpoints for system update
             Route::post('/check', [SystemUpdateController::class, 'check'])->name('check');
             Route::post('/download', [SystemUpdateController::class, 'download'])->name('download');
@@ -381,7 +387,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/history', [SystemUpdateController::class, 'history'])->name('history');
             Route::post('/test-connection', [SystemUpdateController::class, 'testConnection'])->name('test_connection');
         });
-        
+
         // -------- ACTIVITY LOGS --------
         Route::prefix('activity-logs')->name('activity_logs.')->group(function () {
             Route::get('/', [ActivityLogController::class, 'index'])->name('index');
@@ -389,7 +395,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/export', [ActivityLogController::class, 'export'])->name('export');
             Route::delete('/clear', [ActivityLogController::class, 'clearOldLogs'])->name('clear');
         });
-        
+
         // -------- SETTINGS --------
         Route::prefix('settings')->name('settings.')->group(function () {
             // Union Settings
@@ -397,12 +403,12 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/union/update', [UnionSettingController::class, 'update'])->name('union.update');
             Route::post('/union/delete-image', [UnionSettingController::class, 'deleteImage'])->name('union.delete-image');
             Route::get('/union/reset', [UnionSettingController::class, 'reset'])->name('union.reset');
-            
+
             // Backup Settings
             Route::get('/backup', [UnionSettingController::class, 'backupSettings'])->name('backup');
             Route::put('/backup/update', [UnionSettingController::class, 'updateBackupSettings'])->name('update-backup');
             Route::post('/backup/test', [UnionSettingController::class, 'testBackup'])->name('test-backup');
-            
+
             // Additional Backup Routes
             Route::get('/backup/logs', [UnionSettingController::class, 'getBackupLogs'])->name('backup.logs');
             Route::post('/backup/cleanup', [UnionSettingController::class, 'runBackupCleanup'])->name('backup.cleanup');
@@ -424,14 +430,14 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{application}/certificate-pdf-qr', [CertificateVerificationController::class, 'generatePDF'])->name('certificate.pdf.qr');
             Route::post('/bulk-download', [CertificateVerificationController::class, 'bulkGeneratePDF'])->name('bulk.download');
         });
-        
+
         // ================= USER MANAGEMENT ROUTES =================
         Route::prefix('users')->name('users.')->group(function() {
             // প্রধান ইউজার লিস্ট (সব টাইপ)
             Route::get('/', [SuperAdminUserController::class, 'index'])->name('index');
 
             Route::get('/export', [SuperAdminUserController::class, 'export'])->name('export');
-            
+
             // আলাদা ইউজার টাইপ লিস্ট
             Route::prefix('admins')->name('admins.')->group(function() {
                 Route::get('/', [SuperAdminUserController::class, 'adminList'])->name('index');
@@ -440,7 +446,7 @@ Route::middleware(['auth'])->group(function () {
                 Route::get('/{user}/edit', [SuperAdminUserController::class, 'editAdmin'])->name('edit');  // এখানে {user}
                 Route::put('/{user}', [SuperAdminUserController::class, 'updateAdmin'])->name('update');  // এখানে {user}
             });
-            
+
             Route::prefix('secretaries')->name('secretaries.')->group(function() {
                 Route::get('/', [SuperAdminUserController::class, 'secretaryList'])->name('index');
                 Route::get('/create', [SuperAdminUserController::class, 'createSecretary'])->name('create');
@@ -448,7 +454,7 @@ Route::middleware(['auth'])->group(function () {
                 Route::get('/{user}/edit', [SuperAdminUserController::class, 'editSecretary'])->name('edit');  // এখানে {user}
                 Route::put('/{user}', [SuperAdminUserController::class, 'updateSecretary'])->name('update');  // এখানে {user}
             });
-            
+
             Route::prefix('citizens')->name('citizens.')->group(function() {
                 Route::get('/', [SuperAdminUserController::class, 'citizenList'])->name('index');
                 Route::get('/create', [SuperAdminUserController::class, 'createCitizen'])->name('create');
@@ -456,7 +462,7 @@ Route::middleware(['auth'])->group(function () {
                 Route::get('/{user}/edit', [SuperAdminUserController::class, 'editCitizen'])->name('edit');  // এখানে {user}
                 Route::put('/{user}', [SuperAdminUserController::class, 'updateCitizen'])->name('update');  // এখানে {user}
             });
-            
+
             // কমন ইউজার অপারেশন
             Route::get('/create', [SuperAdminUserController::class, 'create'])->name('create');
             Route::post('/', [SuperAdminUserController::class, 'store'])->name('store');
@@ -464,10 +470,10 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{user}/edit', [SuperAdminUserController::class, 'edit'])->name('edit');
             Route::put('/{user}', [SuperAdminUserController::class, 'update'])->name('update');
             Route::delete('/{user}', [SuperAdminUserController::class, 'destroy'])->name('destroy');
-            
+
             // Status Update Route
             Route::put('/{user}/status', [SuperAdminUserController::class, 'updateStatus'])->name('update-status');
-            
+
             Route::post('/bulk-action', [SuperAdminUserController::class, 'bulkAction'])->name('bulk.action');
         });
 
@@ -477,27 +483,27 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', function () {
                 return redirect()->route('super_admin.users.admins.edit', auth()->user());
             })->name('show');
-            
+
             // Profile Password Change Page
             Route::get('/password', function () {
                 return view('super_admin.profile.password');
             })->name('password');
-            
+
             // Update Password
             Route::post('/update-password', function (\Illuminate\Http\Request $request) {
                 $request->validate([
                     'current_password' => 'required',
                     'password' => 'required|confirmed|min:8',
                 ]);
-                
+
                 if (!\Hash::check($request->current_password, auth()->user()->password)) {
                     return back()->withErrors(['current_password' => 'Current password is incorrect']);
                 }
-                
+
                 auth()->user()->update([
                     'password' => \Hash::make($request->password)
                 ]);
-                
+
                 return back()->with('success', 'Password updated successfully');
             })->name('update-password');
         });
@@ -510,7 +516,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/configuration/update', [SuperAdminBkashController::class, 'updateConfiguration'])->name('configuration.update');
             Route::get('/financial-reports', [SuperAdminBkashController::class, 'financialReports'])->name('financial.reports');
             Route::get('/financial-reports/download', [SuperAdminBkashController::class, 'downloadFinancialReport'])->name('financial.reports.download');
-            
+
             // Additional bKash routes
             Route::get('/api-test', [SuperAdminBkashController::class, 'apiTest'])->name('api.test');
             Route::post('/api-test/execute', [SuperAdminBkashController::class, 'executeApiTest'])->name('api.test.execute');
@@ -536,13 +542,13 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{application}/download', [PdfController::class, 'downloadCertificate'])->name('download');
             Route::get('/preview', [PdfController::class, 'previewCertificate'])->name('preview');
         });
-        
+
         // -------- VERIFICATION SYSTEM MANAGEMENT --------
         Route::prefix('verification')->name('verification.')->group(function () {
             Route::get('/logs', function () {
                 return view('super_admin.verification.logs');
             })->name('logs');
-            
+
             Route::get('/statistics', function () {
                 return view('super_admin.verification.statistics');
             })->name('statistics');
@@ -584,17 +590,17 @@ Route::middleware(['auth'])->group(function () {
         ->name('bkash.test.payment');
     Route::post('/test-bkash-process/{paymentID}', [PaymentController::class, 'processTestPayment'])
         ->name('bkash.test.process');
-    
+
     // ================= SIMULATION ROUTES =================
     Route::prefix('simulate')->name('simulate.')->group(function () {
         Route::get('/bkash-payment', function () {
             return view('payment.simulate.bkash');
         })->name('bkash.payment');
-        
+
         Route::post('/bkash-process', [PaymentController::class, 'simulateBkashPayment'])
             ->name('bkash.process');
     });
-    
+
     // ================= TEST BKASH API ROUTE =================
     Route::get('/test-bkash-api', function () {
         // Test API logic
