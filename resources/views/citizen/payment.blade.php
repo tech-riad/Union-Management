@@ -171,9 +171,9 @@
 
                     <form id="bkashPaymentForm"
                         action="{{ route('citizen.payments.bkash-create-payment') }}"
-                        method="GET"
-                        class="gateway-form"
-                        >
+                        method="POST"
+                        class="gateway-form">
+                        @csrf
                         <input type="hidden" name="invoice_no" value="{{ $invoice->id }}">
                         <input type="hidden" name="amount" value="{{ $invoice->amount }}">
 
@@ -182,6 +182,11 @@
                             bKash Pay ৳{{ number_format($invoice->amount, 2) }}
                         </button>
                     </form>
+
+                    <p id="errorMessage" class="text-red-600 mt-2 hidden">
+                        <span id="errorText"></span>
+                    </p>
+
 
 
                 </div>
@@ -344,39 +349,62 @@
 @push('scripts')
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
 
-        const errorMessage = document.getElementById('errorMessage');
-        const errorText = document.getElementById('errorText');
+    const errorMessage = document.getElementById('errorMessage');
+    const errorText = document.getElementById('errorText');
 
-        function showError(msg) {
-            errorText.innerText = msg;
-            errorMessage.classList.remove('hidden');
-        }
+    function showError(msg) {
+        errorText.innerText = msg;
+        errorMessage.classList.remove('hidden');
+    }
 
-        function resetForm(btn) {
-            btn.disabled = false;
-            btn.innerHTML = 'bKash Pay';
-        }
+    function resetForm(btn) {
+        btn.disabled = false;
+        btn.innerHTML = 'bKash Pay ৳{{ number_format($invoice->amount, 2) }}';
+    }
 
-        const bkashForm = document.getElementById('bkashPaymentForm');
+    const bkashForm = document.getElementById('bkashPaymentForm');
 
-        if (bkashForm) {
-            bkashForm.addEventListener('submit', function (e) {
-                e.preventDefault();
+    if (bkashForm) {
+        bkashForm.addEventListener('submit', function (e) {
+            e.preventDefault();
 
-                const submitBtn = document.getElementById('bkashSubmitBtn');
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = 'প্রক্রিয়াকরণ হচ্ছে...';
+            const submitBtn = document.getElementById('bkashSubmitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'প্রক্রিয়াকরণ হচ্ছে...';
 
-                const params = new URLSearchParams(new FormData(this)).toString();
+            const formData = new FormData(this);
 
-                window.location.href = this.action + '?' + params;
+            fetch(this.action, {
+                method: 'POST', // ✅ POST method
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.bkashURL) {
+                    // Redirect to bKash popup / checkout page
+                    window.location.href = data.bkashURL;
+                } else {
+                    showError(data.statusMessage || 'bKash payment শুরু করতে সমস্যা হয়েছে');
+                    resetForm(submitBtn);
+                }
+            })
+            .catch(err => {
+                console.error('bKash error:', err);
+                showError('নেটওয়ার্ক ত্রুটি। অনুগ্রহ করে আবার চেষ্টা করুন');
+                resetForm(submitBtn);
             });
-        }
+        });
+    }
 
-    });
+});
 </script>
+
 
 {{-- <script>
 document.getElementById('bkashPayBtn').addEventListener('click', function () {
