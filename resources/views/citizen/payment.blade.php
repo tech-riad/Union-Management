@@ -77,7 +77,7 @@
         <!-- পেমেন্ট গেটওয়ে সিলেকশন -->
         <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
             <h3 class="text-xl font-semibold text-gray-800 mb-6">পেমেন্ট মাধ্যম নির্বাচন করুন</h3>
-            
+
             <div id="paymentForm">
                 <!-- Gateway Selection -->
                 <div class="mb-6">
@@ -87,14 +87,14 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <!-- bKash Option -->
                         <div class="relative">
-                            <input type="radio" 
-                                   name="gateway" 
-                                   id="gateway_bkash" 
+                            <input type="radio"
+                                   name="gateway"
+                                   id="gateway_bkash"
                                    value="bkash"
                                    class="hidden peer"
                                    data-form-id="bkash_form"
                                    checked>
-                            <label for="gateway_bkash" 
+                            <label for="gateway_bkash"
                                    class="flex items-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-green-500 peer-checked:border-green-500 peer-checked:bg-green-50 transition duration-300">
                                 <div class="flex-shrink-0 w-12 h-12 mr-4">
                                     <div class="w-12 h-12 bg-green-100 rounded flex items-center justify-center">
@@ -113,13 +113,13 @@
 
                         <!-- Manual Payment Option -->
                         <div class="relative">
-                            <input type="radio" 
-                                   name="gateway" 
-                                   id="gateway_manual" 
+                            <input type="radio"
+                                   name="gateway"
+                                   id="gateway_manual"
                                    value="manual"
                                    class="hidden peer"
                                    data-form-id="manual_form">
-                            <label for="gateway_manual" 
+                            <label for="gateway_manual"
                                    class="flex items-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-green-500 peer-checked:border-green-500 peer-checked:bg-green-50 transition duration-300">
                                 <div class="flex-shrink-0 w-12 h-12 mr-4">
                                     <div class="w-12 h-12 bg-yellow-100 rounded flex items-center justify-center">
@@ -142,7 +142,7 @@
                 </div>
 
                 <!-- Gateway Specific Forms -->
-                
+
                 <!-- bKash Form -->
                 <div  class="gateway-form">
                     <div class="bg-green-50 border border-green-200 rounded-xl p-5 mb-6">
@@ -171,17 +171,20 @@
 
                     <form id="bkashPaymentForm"
                         action="{{ route('citizen.payments.bkash-create-payment') }}"
-                        method="POST"
-                        class="gateway-form">
+                        method="POST">
                         @csrf
+
                         <input type="hidden" name="invoice_no" value="{{ $invoice->id }}">
                         <input type="hidden" name="amount" value="{{ $invoice->amount }}">
 
-                        <button type="submit" id="bkashSubmitBtn"
-                            class="w-full bg-green-600 text-white py-3 rounded font-bold">
-                            bKash Pay ৳{{ number_format($invoice->amount, 2) }}
+                        <button id="bkashSubmitBtn"
+                            class="w-full bg-pink-600 text-white py-3 rounded font-bold">
+                            Pay with bKash ৳{{ number_format($invoice->amount,2) }}
                         </button>
                     </form>
+
+
+
 
                     <p id="errorMessage" class="text-red-600 mt-2 hidden">
                         <span id="errorText"></span>
@@ -223,8 +226,8 @@
                             <label for="transaction_id" class="block text-gray-700 text-sm font-medium mb-2">
                                 ট্রানজেকশন আইডি (ঐচ্ছিক)
                             </label>
-                            <input type="text" 
-                                   id="transaction_id" 
+                            <input type="text"
+                                   id="transaction_id"
                                    name="transaction_id"
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                    placeholder="ব্যাংক/বিকাশ ট্রানজেকশন আইডি">
@@ -234,8 +237,8 @@
                             <label for="payment_date" class="block text-gray-700 text-sm font-medium mb-2">
                                 পেমেন্ট তারিখ *
                             </label>
-                            <input type="date" 
-                                   id="payment_date" 
+                            <input type="date"
+                                   id="payment_date"
                                    name="payment_date"
                                    required
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
@@ -247,7 +250,7 @@
                             <label for="payment_note" class="block text-gray-700 text-sm font-medium mb-2">
                                 মন্তব্য (ঐচ্ছিক)
                             </label>
-                            <textarea id="payment_note" 
+                            <textarea id="payment_note"
                                       name="payment_note"
                                       rows="3"
                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
@@ -256,7 +259,7 @@
 
                         <!-- Submit Button for Manual Payment -->
                         <div class="mb-6">
-                            <button type="submit" 
+                            <button type="submit"
                                     class="w-full py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-bold rounded-lg hover:from-yellow-600 hover:to-yellow-700 focus:outline-none focus:ring-4 focus:ring-yellow-300 transition duration-300">
                                 <div class="flex items-center justify-center">
                                     <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -336,7 +339,7 @@
 
         <!-- Back Button -->
         <div class="text-center">
-            <a href="{{ route('citizen.invoices.index') }}" 
+            <a href="{{ route('citizen.invoices.index') }}"
                class="inline-flex items-center px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition duration-300">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
@@ -349,61 +352,41 @@
 @push('scripts')
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+document.getElementById('bkashPaymentForm').addEventListener('submit', function(e){
+    e.preventDefault();
 
-    const errorMessage = document.getElementById('errorMessage');
-    const errorText = document.getElementById('errorText');
+    const btn = document.getElementById('bkashSubmitBtn');
+    const errorBox = document.getElementById('errorBox');
 
-    function showError(msg) {
-        errorText.innerText = msg;
-        errorMessage.classList.remove('hidden');
-    }
+    btn.disabled = true;
+    btn.innerText = 'Processing...';
 
-    function resetForm(btn) {
+    fetch(this.action, {
+        method: 'POST',
+        body: new FormData(this),
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json'
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.bkashURL) {
+            window.location.href = data.bkashURL;
+        } else {
+            errorBox.innerText = data.message || 'bKash error';
+            errorBox.classList.remove('hidden');
+            btn.disabled = false;
+        }
+    })
+    .catch(() => {
+        errorBox.innerText = 'Network error';
+        errorBox.classList.remove('hidden');
         btn.disabled = false;
-        btn.innerHTML = 'bKash Pay ৳{{ number_format($invoice->amount, 2) }}';
-    }
-
-    const bkashForm = document.getElementById('bkashPaymentForm');
-
-    if (bkashForm) {
-        bkashForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-
-            const submitBtn = document.getElementById('bkashSubmitBtn');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = 'প্রক্রিয়াকরণ হচ্ছে...';
-
-            const formData = new FormData(this);
-
-            fetch(this.action, {
-                method: 'POST', // ✅ POST method
-                body: formData,
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.bkashURL) {
-                    // Redirect to bKash popup / checkout page
-                    window.location.href = data.bkashURL;
-                } else {
-                    showError(data.statusMessage || 'bKash payment শুরু করতে সমস্যা হয়েছে');
-                    resetForm(submitBtn);
-                }
-            })
-            .catch(err => {
-                console.error('bKash error:', err);
-                showError('নেটওয়ার্ক ত্রুটি। অনুগ্রহ করে আবার চেষ্টা করুন');
-                resetForm(submitBtn);
-            });
-        });
-    }
-
+    });
 });
 </script>
+
 
 
 {{-- <script>

@@ -1,11 +1,10 @@
 <?php
 
 return [
-    "sandbox"         => env("BKASH_SANDBOX", true),
-    "bkash_app_key"     => env("BKASH_APP_KEY"),
-    "bkash_app_secret" => env("BKASH_APP_SECRET"),
-    "bkash_username"      => env("BKASH_USERNAME"),
-    "bkash_password"     => env("BKASH_PASSWORD"),
-    "callbackURL"     => env("BKASH_CALLBACK_URL"),
-    'timezone'        => 'Asia/Dhaka',
+    'app_key' => env('BKASH_LIVE_APP_KEY'),
+    'app_secret' => env('BKASH_LIVE_APP_SECRET'),
+    'username' => env('BKASH_LIVE_USERNAME'),
+    'password' => env('BKASH_LIVE_PASSWORD'),
+    'base_url' => 'https://tokenized.pay.bka.sh', // LIVE URL
+    'callbackURL' => env('BKASH_CALLBACK_URL'),
 ];

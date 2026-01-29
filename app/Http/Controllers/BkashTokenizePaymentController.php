@@ -1,95 +1,102 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Karim007\LaravelBkashTokenize\Facade\BkashPaymentTokenize;
-use Karim007\LaravelBkashTokenize\Facade\BkashRefundTokenize;
 
 class BkashTokenizePaymentController extends Controller
 {
     public function index()
     {
-        return view('bkashT::bkash-payment');
+        return view('bkash.payment');
     }
+
+    /**
+     * STEP 1: Create Payment
+     */
     public function createPayment(Request $request)
-{
-    $inv = uniqid();
-    $request['intent'] = 'sale';
-    $request['mode'] = '0011'; // 0011 for checkout
-    $request['payerReference'] = $inv;
-    $request['currency'] = 'BDT';
-    $request['amount'] = $request->amount ?? 10;
-    $request['merchantInvoiceNumber'] = $inv;
-    $request['callbackURL'] = config("bkash.callbackURL");
-
-    $request_data_json = json_encode($request->all());
-
-    $response = BkashPaymentTokenize::cPayment($request_data_json);
-
-    if (isset($response['bkashURL'])) {
-        return response()->json([
-            'bkashURL' => $response['bkashURL']
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:1',
+            'invoice_no' => 'required'
         ]);
-    } else {
+
+        $uniqueInvoice = 'INV-'.$request->invoice_no.'-'.uniqid();
+
+        $bkashRequest = [
+            'intent' => 'sale',
+            'mode' => '0011',
+            'payerReference' => $uniqueInvoice,
+            'currency' => 'BDT',
+            'amount' => number_format($request->amount, 2, '.', ''),
+            'merchantInvoiceNumber' => $uniqueInvoice,
+            'callbackURL' => route('bkash.callback'),
+        ];
+
+        $response = BkashPaymentTokenize::cPayment(json_encode($bkashRequest));
+
+        Log::info('bKash Create Payment', $response);
+
+        if (isset($response['bkashURL'])) {
+
+            session([
+                'bkash_payment_id' => $response['paymentID'],
+                'invoice_no' => $request->invoice_no,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'bkashURL' => $response['bkashURL'],
+            ]);
+        }
+
         return response()->json([
-            'statusMessage' => $response['statusMessage'] ?? 'Failed to create payment'
-        ]);
+            'success' => false,
+            'message' => $response['statusMessage'] ?? 'Payment creation failed'
+        ], 422);
     }
-}
 
-
+    /**
+     * STEP 2: Callback (Money deducted here)
+     */
     public function callBack(Request $request)
     {
-        //callback request params
-        // paymentID=your_payment_id&status=success&apiVersion=1.2.0-beta
-        //using paymentID find the account number for sending params
+        Log::info('bKash Callback', $request->all());
 
-        if ($request->status == 'success'){
-            $response = BkashPaymentTokenize::executePayment($request->paymentID);
-            //$response = BkashPaymentTokenize::executePayment($request->paymentID, 1); //last parameter is your account number for multi account its like, 1,2,3,4,cont..
-            if (!$response){ //if executePayment payment not found call queryPayment
-                $response = BkashPaymentTokenize::queryPayment($request->paymentID);
-                //$response = BkashPaymentTokenize::queryPayment($request->paymentID,1); //last parameter is your account number for multi account its like, 1,2,3,4,cont..
-            }
-
-            if (isset($response['statusCode']) && $response['statusCode'] == "0000" && $response['transactionStatus'] == "Completed") {
-                /*
-                 * for refund need to store
-                 * paymentID and trxID
-                 * */
-                return BkashPaymentTokenize::success('Thank you for your payment', $response['trxID']);
-            }
-            return BkashPaymentTokenize::failure($response['statusMessage']);
-        }else if ($request->status == 'cancel'){
-            return BkashPaymentTokenize::cancel('Your payment is canceled');
-        }else{
-            return BkashPaymentTokenize::failure('Your transaction is failed');
+        if (!$request->paymentID) {
+            return BkashPaymentTokenize::failure('Payment ID missing');
         }
-    }
 
-    public function searchTnx($trxID)
-    {
-        //response
-        return BkashPaymentTokenize::searchTransaction($trxID);
-        //return BkashPaymentTokenize::searchTransaction($trxID,1); //last parameter is your account number for multi account its like, 1,2,3,4,cont..
-    }
+        if ($request->status === 'success') {
 
-    public function refund(Request $request)
-    {
-        $paymentID='Your payment id';
-        $trxID='your transaction no';
-        $amount=5;
-        $reason='this is test reason';
-        $sku='abc';
-        //response
-        return BkashRefundTokenize::refund($paymentID,$trxID,$amount,$reason,$sku);
-        //return BkashRefundTokenize::refund($paymentID,$trxID,$amount,$reason,$sku, 1); //last parameter is your account number for multi account its like, 1,2,3,4,cont..
-    }
-    public function refundStatus(Request $request)
-    {
-        $paymentID='Your payment id';
-        $trxID='your transaction no';
-        return BkashRefundTokenize::refundStatus($paymentID,$trxID);
-        //return BkashRefundTokenize::refundStatus($paymentID,$trxID, 1); //last parameter is your account number for multi account its like, 1,2,3,4,cont..
+            $execute = BkashPaymentTokenize::executePayment($request->paymentID)
+                ?? BkashPaymentTokenize::queryPayment($request->paymentID);
+
+            Log::info('bKash Execute', $execute);
+
+            if (
+                isset($execute['statusCode'], $execute['transactionStatus']) &&
+                $execute['statusCode'] === '0000' &&
+                $execute['transactionStatus'] === 'Completed'
+            ) {
+                // ✅ টাকা এখানে সত্যিই কাটা হয়
+                return BkashPaymentTokenize::success(
+                    'Payment Successful',
+                    $execute['trxID']
+                );
+            }
+
+            return BkashPaymentTokenize::failure(
+                $execute['statusMessage'] ?? 'Execution failed'
+            );
+        }
+
+        if ($request->status === 'cancel') {
+            return BkashPaymentTokenize::cancel('Payment cancelled');
+        }
+
+        return BkashPaymentTokenize::failure('Payment failed');
     }
 }
