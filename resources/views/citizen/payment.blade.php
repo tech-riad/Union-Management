@@ -352,92 +352,62 @@
 @push('scripts')
 
 <script>
-document.getElementById('bkashPaymentForm').addEventListener('submit', function(e){
-    e.preventDefault();
+document.addEventListener('DOMContentLoaded', function () {
 
-    const btn = document.getElementById('bkashSubmitBtn');
-    const errorBox = document.getElementById('errorBox');
+    const errorMessage = document.getElementById('errorMessage');
+    const errorText = document.getElementById('errorText');
 
-    btn.disabled = true;
-    btn.innerText = 'Processing...';
+    function showError(msg) {
+        errorText.innerText = msg;
+        errorMessage.classList.remove('hidden');
+    }
 
-    fetch(this.action, {
-        method: 'POST',
-        body: new FormData(this),
-        headers: {
-            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-            'Accept': 'application/json'
-        }
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.bkashURL) {
-            window.location.href = data.bkashURL;
-        } else {
-            errorBox.innerText = data.message || 'bKash error';
-            errorBox.classList.remove('hidden');
-            btn.disabled = false;
-        }
-    })
-    .catch(() => {
-        errorBox.innerText = 'Network error';
-        errorBox.classList.remove('hidden');
+    function resetForm(btn) {
         btn.disabled = false;
-    });
+        btn.innerHTML = 'bKash Pay ৳{{ number_format($invoice->amount, 2) }}';
+    }
+
+    const bkashForm = document.getElementById('bkashPaymentForm');
+
+    if (bkashForm) {
+        bkashForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('bkashSubmitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'প্রক্রিয়াকরণ হচ্ছে...';
+
+            const formData = new FormData(this);
+
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.bkashURL) {
+                    window.location.href = data.bkashURL;
+                } else {
+                    showError(data.statusMessage || 'bKash payment শুরু করতে সমস্যা হয়েছে');
+                    resetForm(submitBtn);
+                }
+            })
+            .catch(err => {
+                console.error('bKash error:', err);
+                showError('নেটওয়ার্ক ত্রুটি। অনুগ্রহ করে আবার চেষ্টা করুন');
+                resetForm(submitBtn);
+            });
+        });
+    }
+
 });
 </script>
 
 
-
-{{-- <script>
-document.getElementById('bkashPayBtn').addEventListener('click', function () {
-
-    bKash.init({
-        paymentMode: 'checkout',
-
-        paymentRequest: {
-            amount: "{{ $invoice->amount }}",
-            intent: 'sale'
-        },
-
-        createRequest: function (request) {
-            fetch("{{ route('bkash.create') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
-                },
-                body: JSON.stringify({
-                    invoice_id: "{{ $invoice->id }}"
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                bKash.create().onSuccess(data);
-            });
-        },
-
-        executeRequestOnAuthorization: function () {
-            fetch("{{ route('bkash.execute') }}", {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
-                }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    alert('Payment Successful!');
-                    location.reload();
-                }
-            });
-        }
-    });
-
-    bKash.reconfigure();
-    bKash.create();
-});
-</script> --}}
 @endpush
 
 
