@@ -18,6 +18,15 @@ class ProfileUpdateRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($this->user()->id)],
+            'mobile' => ['required', 'string', 'regex:/^(\\+?88)?01[3-9]\\d{8}$/'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'mobile.required' => 'Please provide a mobile number. AmarPay requires a valid contact number.',
+            'mobile.regex' => 'Enter a valid Bangladeshi mobile number (e.g., 01XXXXXXXXX or +8801XXXXXXXXX).',
         ];
     }
 }

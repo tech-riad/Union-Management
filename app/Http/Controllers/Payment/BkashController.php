@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Payment;
 
 use Illuminate\Http\Request;
 use Karim007\LaravelBkash\Facades\Bkash;
+use App\Http\Controllers\Controller;
 
-class BkashPaymentController extends Controller
+class BkashController extends Controller
 {
     public function pay(Request $request)
     {

@@ -47,6 +47,13 @@
             @endif
         </div>
 
+        <div class="mt-4">
+            <x-input-label for="mobile" :value="__('Mobile (required for AmarPay)')" />
+            <x-text-input id="mobile" name="mobile" type="text" class="mt-1 block w-full" :value="old('mobile', $user->mobile)" required autocomplete="tel" />
+            <x-input-error class="mt-2" :messages="$errors->get('mobile')" />
+            <p class="text-sm text-gray-500 mt-1">{{ __('Example: 01XXXXXXXXX or +8801XXXXXXXXX') }}</p>
+        </div>
+
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Save') }}</x-primary-button>
 

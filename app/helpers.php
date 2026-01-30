@@ -2,6 +2,8 @@
 
 namespace App\Helpers;
 
+if (! class_exists(\App\Helpers\PdfHelper::class)) {
+
 class PdfHelper
 {
     public static function banglaNumber($number)
@@ -14,20 +16,20 @@ class PdfHelper
     public static function banglaDate($date)
     {
         if (!$date) return 'তারিখ নেই';
-        
+
         $banglaMonths = [
             'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
             'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'
         ];
-        
+
         if (is_string($date)) {
             $date = \Carbon\Carbon::parse($date);
         }
-        
+
         $day = self::banglaNumber($date->day);
         $month = $banglaMonths[$date->month - 1] ?? 'মাস';
         $year = self::banglaNumber($date->year);
-        
+
         return $day . ' ' . $month . ' ' . $year;
     }
 
@@ -35,4 +37,6 @@ class PdfHelper
     {
         return self::banglaNumber($amount) . ' ৳';
     }
+}
+
 }
