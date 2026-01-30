@@ -53,9 +53,9 @@ class PaymentController extends Controller
         CURLOPT_POSTFIELDS =>'{
             "store_id": "'.$store_id.'",
             "tran_id": "'.$tran_id.'",
-            "success_url": "'.route('success').'",
-            "fail_url": "'.route('fail').'",
-            "cancel_url": "'.route('cancel').'",
+            "success_url": "'.route('citizen.payments.success').'",
+            "fail_url": "'.route('citizen.payments.fail').'",
+            "cancel_url": "'.route('citizen.payments.cancel').'",
             "amount": "'.$amount.'",
             "currency": "'.$currency.'",
             "signature_key": "'.$signature_key.'",
@@ -94,7 +94,8 @@ class PaymentController extends Controller
         }
     }
 
-     public function success(Request $request){
+    public function success(Request $request)
+    {
 
         $request_id= $request->mer_txnid;
 
