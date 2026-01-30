@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Application;
 use App\Models\BkashTransaction;
 use App\Models\Invoice;
 use Illuminate\Http\Request;
@@ -93,9 +94,13 @@ class BkashTokenizePaymentController extends Controller
                 Invoice::where('id', $payment->invoice_id)->update([
                     'payment_status' => 'paid',
                     'payment_method' => 'Bkash',
-                    'status' => 'paid',
+                    'status' => 'approved',
                     'transaction_id' => $execute['trxID'],
                     'payment_gateway' => 'Bkash',
+                    'paid_at' => now()
+                ]);
+                Application::where('invoice_id', $payment->invoice_id)->update([
+                    'payment_status' => 'paid',
                     'paid_at' => now()
                 ]);
 
