@@ -187,9 +187,9 @@ Route::middleware(['auth'])->group(function () {
             // Route::post('/bkash/callback', [App\Http\Controllers\BkashTokenizePaymentController::class,'callBack'])->name('bkash-callBack');
 
             Route::post('/amarpay/create/{invoice}', [PaymentController::class, 'createAmarPayPayment'])->name('amarpay.create');
-            Route::post('success',[PaymentController::class,'success'])->name('amarpay.success');
-            Route::post('fail',[PaymentController::class,'fail'])->name('amarpay.fail');
-            Route::get('cancel',[PaymentController::class,'cancel'])->name('amarpay.cancel');
+            Route::match(['get','post'],'amarpay/success',[PaymentController::class,'success'])->name('amarpay.success');
+            Route::match(['get','post'],'amarpay/fail',[PaymentController::class,'fail'])->name('amarpay.fail');
+            Route::match(['get','post'],'amarpay/cancel',[PaymentController::class,'cancel'])->name('amarpay.cancel');
 
             Route::get('/{invoice}', [PaymentController::class, 'showPaymentPage'])->name('show');
             Route::post('/{invoice}/initiate', [PaymentController::class, 'initiatePayment'])->name('initiate');
@@ -618,14 +618,13 @@ Route::get('/payment/failed', function () {
     return redirect()->route('citizen.payments.failed');
 })->name('public.payment.failed');
 
-// ================= DEBUG ROUTES =================
-Route::get('/debug-test', function() {
-    return response()->json([
-        'status' => 'ok',
-        'message' => 'Server is working',
-        'time' => now()->toDateTimeString()
-    ]);
-});
+// Public AmarPay endpoints (used by gateway for redirects / server posts)
+Route::match(['get','post'], '/payment/amarpay/success', [App\Http\Controllers\Citizen\PaymentController::class, 'success'])
+    ->name('payment.amarpay.success');
+Route::match(['get','post'], '/payment/amarpay/fail', [App\Http\Controllers\Citizen\PaymentController::class, 'fail'])
+    ->name('payment.amarpay.fail');
+Route::match(['get','post'], '/payment/amarpay/cancel', [App\Http\Controllers\Citizen\PaymentController::class, 'cancel'])
+    ->name('payment.amarpay.cancel');
 
 Route::get('/debug-db', function() {
     try {

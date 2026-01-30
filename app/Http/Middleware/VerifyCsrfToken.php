@@ -15,5 +15,10 @@ class VerifyCsrfToken extends Middleware
     'citizen/payments/success',
     'citizen/payments/fail',
     'citizen/payments/cancel',
+    // Public AmarPay endpoints (gateway may POST without CSRF token/session)
+    'payment/amarpay/success',
+    'payment/amarpay/fail',
+    'payment/amarpay/cancel',
+    'payment/amarpay/callback',
     ];
 }
