@@ -111,6 +111,31 @@
                             </label>
                         </div>
 
+                        <!-- AmarPay Option -->
+                        <div class="relative">
+                            <input type="radio"
+                                   name="gateway"
+                                   id="gateway_amarpay"
+                                   value="amarpay"
+                                   class="hidden peer"
+                                   data-form-id="amarpay_form">
+                            <label for="gateway_amarpay"
+                                   class="flex items-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-purple-500 peer-checked:border-purple-500 peer-checked:bg-purple-50 transition duration-300">
+                                <div class="flex-shrink-0 w-12 h-12 mr-4">
+                                    <div class="w-12 h-12 bg-purple-100 rounded flex items-center justify-center">
+                                        <span class="text-purple-600 font-bold text-lg">AP</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">AmarPay</h4>
+                                    <p class="text-sm text-gray-600">কার্ড / ব্যাংক / মোবাইল ব্যাংকিং</p>
+                                </div>
+                                <svg class="w-6 h-6 text-purple-500 ml-auto hidden peer-checked:block" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                            </label>
+                        </div>
+
                         <!-- Manual Payment Option -->
                         <div class="relative">
                             <input type="radio"
@@ -144,7 +169,7 @@
                 <!-- Gateway Specific Forms -->
 
                 <!-- bKash Form -->
-                <div  class="gateway-form">
+                <div id="bkash_form" class="gateway-form">
                     <div class="bg-green-50 border border-green-200 rounded-xl p-5 mb-6">
                         <h4 class="font-semibold text-green-800 mb-3">bKash পেমেন্ট নির্দেশনা</h4>
                         <ul class="space-y-2 text-green-700 text-sm">
@@ -192,6 +217,37 @@
 
 
 
+                </div>
+
+                <!-- AmarPay Form -->
+                <div id="amarpay_form" class="gateway-form hidden">
+                    <div class="bg-purple-50 border border-purple-200 rounded-xl p-5 mb-6">
+                        <h4 class="font-semibold text-purple-800 mb-3">AmarPay পেমেন্ট নির্দেশনা</h4>
+                        <ul class="space-y-2 text-purple-700 text-sm">
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-purple-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>AmarPay চেকআউটে রিডাইরেক্ট হয়ে কার্ড/মোবাইল ব্যাংকিং এর মাধ্যমে পেমেন্ট সম্পন্ন করুন</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-purple-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>পেমেন্ট সফল হলে আপনাকে স্বয়ংক্রিয়ভাবে সফলতা পেজে রিডাইরেক্ট করা হবে</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <form id="amarpayPaymentForm" action="{{ route('citizen.payments.amarpay.create', $invoice) }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="invoice_no" value="{{ $invoice->id }}">
+                        <input type="hidden" name="amount" value="{{ $invoice->amount }}">
+
+                        <button id="amarpaySubmitBtn" type="submit" class="w-full bg-purple-600 text-white py-3 rounded font-bold">
+                            Pay with AmarPay ৳{{ number_format($invoice->amount,2) }}
+                        </button>
+                    </form>
                 </div>
 
                 <!-- Manual Payment Form -->
@@ -403,6 +459,28 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     }
+
+    // Gateway tab switching
+    const gatewayRadios = document.querySelectorAll('input[name="gateway"]');
+    const gatewayForms = document.querySelectorAll('.gateway-form');
+
+    function showGatewayForm(id) {
+        gatewayForms.forEach(f => f.classList.add('hidden'));
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('hidden');
+    }
+
+    // Show current checked gateway form on load
+    const checked = document.querySelector('input[name="gateway"]:checked');
+    if (checked) {
+        showGatewayForm(checked.getAttribute('data-form-id'));
+    }
+
+    gatewayRadios.forEach(r => {
+        r.addEventListener('change', function() {
+            showGatewayForm(this.getAttribute('data-form-id'));
+        });
+    });
 
 });
 </script>

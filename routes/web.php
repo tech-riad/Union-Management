@@ -186,7 +186,10 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/bkash/create-payment', [App\Http\Controllers\BkashTokenizePaymentController::class,'createPayment'])->name('bkash-create-payment');
             // Route::post('/bkash/callback', [App\Http\Controllers\BkashTokenizePaymentController::class,'callBack'])->name('bkash-callBack');
 
-
+            Route::post('/amarpay/create/{invoice}', [PaymentController::class, 'createAmarPayPayment'])->name('amarpay.create');
+            Route::post('success',[PaymentController::class,'success'])->name('success');
+            Route::post('fail',[PaymentController::class,'fail'])->name('fail');
+            Route::get('cancel',[PaymentController::class,'cancel'])->name('cancel');
 
             Route::get('/{invoice}', [PaymentController::class, 'showPaymentPage'])->name('show');
             Route::post('/{invoice}/initiate', [PaymentController::class, 'initiatePayment'])->name('initiate');

@@ -20,88 +20,116 @@ class PaymentController extends Controller
         return view('citizen.payment', compact('invoice'));
     }
 
-    public function initiatePayment(Invoice $invoice)
+    public function createAmarPayPayment(Request $request)
     {
-        if (auth()->id() !== $invoice->user_id) {
-            abort(403);
-        }
 
-        try {
-            // Prepare request payload
-            $request_data = [
-                'amount'  => $invoice->amount,
-                'intent'  => 'sale',
-                'invoice' => $invoice->invoice_no,
-            ];
 
-            // 🔹 Initiate bKash Payment
-            $response = BkashPayment::cPayment(json_encode($request_data));
+        $invoice = Invoice::findOrFail($request->invoice_no);
 
-            if (!isset($response['bkashURL'])) {
-                Log::error('bKash cPayment failed', $response);
-                return back()->with('error', 'bKash পেমেন্ট শুরু করা যায়নি');
-            }
+        $tran_id = "test".rand(1111111,9999999);//unique transection id for every transection
 
-            // Save transaction
-            BkashTransaction::create([
-                'invoice_id'      => $invoice->id,
-                'payment_id'      => $response['paymentID'] ?? null,
-                'amount'          => $invoice->amount,
-                'currency'        => 'BDT',
-                'status'          => 'pending',
-                'request_payload' => json_encode($request_data),
-            ]);
+        $currency= "BDT"; //aamarPay support Two type of currency USD & BDT
 
-            // Redirect to bKash checkout
-            return redirect()->away($response['bkashURL']);
+        $amount = $invoice->amount;   //10 taka is the minimum amount for show card option in aamarPay payment gateway
 
-        } catch (\Exception $e) {
-            Log::error('bKash initiate error', ['msg' => $e->getMessage()]);
-            return back()->with('error', $e->getMessage());
+        //For live Store Id & Signature Key please mail to support@aamarpay.com
+        $store_id = "aamarpaytest";
+
+        $signature_key = "dbb74894e82415a2f7ff0ec3a97e4183";
+
+        $url = "https://​sandbox​.aamarpay.com/jsonpost.php"; // for Live Transection use "https://secure.aamarpay.com/jsonpost.php"
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+        CURLOPT_URL => $url,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'POST',
+        CURLOPT_POSTFIELDS =>'{
+            "store_id": "'.$store_id.'",
+            "tran_id": "'.$tran_id.'",
+            "success_url": "'.route('success').'",
+            "fail_url": "'.route('fail').'",
+            "cancel_url": "'.route('cancel').'",
+            "amount": "'.$amount.'",
+            "currency": "'.$currency.'",
+            "signature_key": "'.$signature_key.'",
+            "desc": "Merchant Registration Payment",
+            "cus_name": "Name",
+            "cus_email": "payer@merchantcusomter.com",
+            "cus_add1": "House B-158 Road 22",
+            "cus_add2": "Mohakhali DOHS",
+            "cus_city": "Dhaka",
+            "cus_state": "Dhaka",
+            "cus_postcode": "1206",
+            "cus_country": "Bangladesh",
+            "cus_phone": "+8801704",
+            "type": "json"
+        }',
+        CURLOPT_HTTPHEADER => array(
+            'Content-Type: application/json'
+        ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        // dd($response);
+
+        $responseObj = json_decode($response);
+
+        if(isset($responseObj->payment_url) && !empty($responseObj->payment_url)) {
+
+            $paymentUrl = $responseObj->payment_url;
+            // dd($paymentUrl);
+            return redirect()->away($paymentUrl);
+
+        }else{
+            echo $response;
         }
     }
 
-    public function callback(Request $request)
-    {
-        try {
-            $paymentID = $request->paymentID;
+     public function success(Request $request){
 
-            if (!$paymentID) {
-                return redirect()->route('citizen.dashboard')
-                    ->with('error', 'Invalid payment response');
-            }
+        $request_id= $request->mer_txnid;
 
-            // 🔹 Execute Payment
-            $response = BkashPayment::executePayment($paymentID);
+        //verify the transection using Search Transection API
 
-            if (($response['statusCode'] ?? '') !== '0000') {
-                return redirect()->route('citizen.dashboard')
-                    ->with('error', $response['statusMessage'] ?? 'Payment failed');
-            }
+        $url = "http://sandbox.aamarpay.com/api/v1/trxcheck/request.php?request_id=$request_id&store_id=aamarpaytest&signature_key=dbb74894e82415a2f7ff0ec3a97e4183&type=json";
 
-            $transaction = BkashTransaction::where('payment_id', $paymentID)->firstOrFail();
-            $invoice = $transaction->invoice;
+        //For Live Transection Use "http://secure.aamarpay.com/api/v1/trxcheck/request.php"
 
-            $transaction->update([
-                'status'           => 'success',
-                'response_payload' => json_encode($response),
-                'payment_time'     => now(),
-            ]);
+        $curl = curl_init();
 
-            $invoice->update([
-                'payment_status' => 'paid',
-                'payment_method' => 'bkash',
-                'paid_at'        => now(),
-            ]);
+        curl_setopt_array($curl, array(
+        CURLOPT_URL => $url,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'GET',
+        ));
 
-            return redirect()
-                ->route('citizen.invoices.show', $invoice)
-                ->with('success', 'bKash পেমেন্ট সফল হয়েছে');
+        $response = curl_exec($curl);
 
-        } catch (\Exception $e) {
-            Log::error('bKash callback error', ['msg' => $e->getMessage()]);
-            return redirect()->route('citizen.dashboard')
-                ->with('error', $e->getMessage());
-        }
+        curl_close($curl);
+        echo $response;
+
     }
+
+    public function fail(Request $request){
+        return $request;
+    }
+
+    public function cancel(){
+        return 'Canceled';
+    }
+
 }
