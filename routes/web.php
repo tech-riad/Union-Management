@@ -186,10 +186,10 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/bkash/create-payment', [App\Http\Controllers\BkashTokenizePaymentController::class,'createPayment'])->name('bkash-create-payment');
             // Route::post('/bkash/callback', [App\Http\Controllers\BkashTokenizePaymentController::class,'callBack'])->name('bkash-callBack');
 
-            Route::post('/amarpay/create/{invoice}', [PaymentController::class, 'createAmarPayPayment'])->name('amarpay.create');
-            Route::match(['get','post'],'amarpay/success',[PaymentController::class,'success'])->name('amarpay.success');
-            Route::match(['get','post'],'amarpay/fail',[PaymentController::class,'fail'])->name('amarpay.fail');
-            Route::match(['get','post'],'amarpay/cancel',[PaymentController::class,'cancel'])->name('amarpay.cancel');
+            Route::post('/amarpay/uni-manage/create/{invoice}', [PaymentController::class, 'createAmarPayPayment'])->name('amarpay.uni.manage.create');
+            Route::match(['get','post'],'amarpay/uni-manage/success',[PaymentController::class,'success'])->name('amarpay.uni.manage.success');
+            Route::match(['get','post'],'amarpay/uni-manage/fail',[PaymentController::class,'fail'])->name('amarpay.uni.manage.fail');
+            Route::match(['get','post'],'amarpay/uni-manage/cancel',[PaymentController::class,'cancel'])->name('amarpay.uni.manage.cancel');
 
             Route::get('/{invoice}', [PaymentController::class, 'showPaymentPage'])->name('show');
             Route::post('/{invoice}/initiate', [PaymentController::class, 'initiatePayment'])->name('initiate');

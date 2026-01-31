@@ -28,7 +28,7 @@ class PaymentController extends Controller
         if (auth()->id() !== $invoice->user_id) {
             abort(403);
         }
-        // dd($request->all());
+        dd($request->all());
 
         $amount = $invoice->amount;
         $currency = config('aamarpay.currency', 'BDT');
@@ -52,9 +52,9 @@ class PaymentController extends Controller
         $payload = [
             'store_id' => $store_id,
             'tran_id' => $tran_id,
-            'success_url' => route('payment.amarpay.success'),
-            'fail_url' => route('payment.amarpay.fail'),
-            'cancel_url' => route('payment.amarpay.cancel'),
+            'success_url' => route('citizen.payments.uni.manage.success'),
+            'fail_url' => route('citizen.payments.uni.manage.fail'),
+            'cancel_url' => route('citizen.payments.uni.manage.cancel'),
             'amount' => (string) $amount,
             'currency' => $currency,
             'signature_key' => $signature_key,

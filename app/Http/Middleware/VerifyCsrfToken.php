@@ -12,7 +12,7 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-    'citizen/payments/success',
+    'citizen/payments/amarpay/uni-manage/success',
     'citizen/payments/fail',
     'citizen/payments/cancel',
     // Public AmarPay endpoints (gateway may POST without CSRF token/session)

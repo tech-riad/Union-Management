@@ -239,7 +239,7 @@
                         </ul>
                     </div>
 
-                    <form id="amarpayPaymentForm" action="{{ route('citizen.payments.amarpay.create', $invoice) }}" method="POST">
+                    <form id="amarpayPaymentForm" action="{{ route('citizen.payments.amarpay.uni.manage.create', $invoice) }}" method="POST">
                         @csrf
                         <input type="hidden" name="invoice_no" value="{{ $invoice->id }}">
                         <input type="hidden" name="amount" value="{{ $invoice->amount }}">
