@@ -28,7 +28,7 @@ class PaymentController extends Controller
         if (auth()->id() !== $invoice->user_id) {
             abort(403);
         }
-        dd($request->all());
+
 
         $amount = $invoice->amount;
         $currency = config('aamarpay.currency', 'BDT');
@@ -52,9 +52,9 @@ class PaymentController extends Controller
         $payload = [
             'store_id' => $store_id,
             'tran_id' => $tran_id,
-            'success_url' => route('citizen.payments.uni.manage.success'),
-            'fail_url' => route('citizen.payments.uni.manage.fail'),
-            'cancel_url' => route('citizen.payments.uni.manage.cancel'),
+            'success_url' => route('citizen.payments.amarpay.uni.manage.success'),
+            'fail_url' => route('citizen.payments.amarpay.uni.manage.fail'),
+            'cancel_url' => route('citizen.payments.amarpay.uni.manage.cancel'),
             'amount' => (string) $amount,
             'currency' => $currency,
             'signature_key' => $signature_key,
@@ -65,6 +65,8 @@ class PaymentController extends Controller
             'type' => 'json'
         ];
 
+        // dd($payload);
+
         try {
             $response = Http::timeout(30)->post($endpoint, $payload);
         } catch (\Exception $e) {
@@ -73,6 +75,7 @@ class PaymentController extends Controller
         }
 
         $data = $response->json();
+        // dd($data);
 
         // store initiation record
         $transaction = AamarpayTransaction::create([
@@ -84,6 +87,7 @@ class PaymentController extends Controller
             'request_payload' => json_encode($payload),
             'response_payload' => json_encode($data),
         ]);
+        // dd($transaction);
 
         if (!empty($data['payment_url'])) {
             return redirect()->away($data['payment_url']);
@@ -94,11 +98,12 @@ class PaymentController extends Controller
 
     public function success(Request $request)
     {
+
         // Log everything to help debugging AmarPay redirects/callbacks
         Log::info('AmarPay success payload', ['method' => $request->method(), 'payload' => $request->all(), 'query' => $request->query()]);
 
         $request_id = $request->input('mer_txnid') ?? $request->input('request_id') ?? $request->query('request_id') ?? null;
-
+        // dd($request_id);
         if (! $request_id) {
             Log::warning('AmarPay success called without transaction id', ['request' => $request->all(), 'query' => $request->query()]);
             return redirect()->route('citizen.invoices.index')->with('error', 'Invalid AmarPay response (missing transaction id).');
