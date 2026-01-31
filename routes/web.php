@@ -187,9 +187,6 @@ Route::middleware(['auth'])->group(function () {
             // Route::post('/bkash/callback', [App\Http\Controllers\BkashTokenizePaymentController::class,'callBack'])->name('bkash-callBack');
 
             Route::post('/amarpay/uni-manage/create/{invoice}', [PaymentController::class, 'createAmarPayPayment'])->name('amarpay.uni.manage.create');
-            Route::match(['get','post'],'amarpay/uni-manage/success',[PaymentController::class,'success'])->name('amarpay.uni.manage.success');
-            Route::match(['get','post'],'amarpay/uni-manage/fail',[PaymentController::class,'fail'])->name('amarpay.uni.manage.fail');
-            Route::match(['get','post'],'amarpay/uni-manage/cancel',[PaymentController::class,'cancel'])->name('amarpay.uni.manage.cancel');
 
             Route::get('/{invoice}', [PaymentController::class, 'showPaymentPage'])->name('show');
             Route::post('/{invoice}/initiate', [PaymentController::class, 'initiatePayment'])->name('initiate');
@@ -618,14 +615,6 @@ Route::get('/payment/failed', function () {
     return redirect()->route('citizen.payments.failed');
 })->name('public.payment.failed');
 
-// Public AmarPay endpoints (used by gateway for redirects / server posts)
-Route::match(['get','post'], '/payment/amarpay/success', [App\Http\Controllers\Citizen\PaymentController::class, 'success'])
-    ->name('payment.amarpay.success');
-Route::match(['get','post'], '/payment/amarpay/fail', [App\Http\Controllers\Citizen\PaymentController::class, 'fail'])
-    ->name('payment.amarpay.fail');
-Route::match(['get','post'], '/payment/amarpay/cancel', [App\Http\Controllers\Citizen\PaymentController::class, 'cancel'])
-    ->name('payment.amarpay.cancel');
-
 Route::get('/debug-db', function() {
     try {
         \DB::connection()->getPdo();
@@ -653,3 +642,6 @@ Route::match(['get','post'],
 )->name('bkash.callback');
 
 
+Route::match(['get','post'],'citizen/payments/amarpay/uni-manage/success',[PaymentController::class,'success'])->name('citizen.payments.amarpay.uni.manage.success');
+Route::match(['get','post'],'citizen/payments/amarpay/uni-manage/fail',[PaymentController::class,'fail'])->name('citizen.payments.amarpay.uni.manage.fail');
+Route::match(['get','post'],'citizen/payments/amarpay/uni-manage/cancel',[PaymentController::class,'cancel'])->name('citizen.payments.amarpay.uni.manage.cancel');

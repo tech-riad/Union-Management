@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Invoice;
 use App\Models\BkashTransaction;
 use App\Models\AamarpayTransaction;
+use App\Models\Application;
+use Dflydev\DotAccessData\Data;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
@@ -98,12 +100,10 @@ class PaymentController extends Controller
 
     public function success(Request $request)
     {
-
-        // Log everything to help debugging AmarPay redirects/callbacks
-        Log::info('AmarPay success payload', ['method' => $request->method(), 'payload' => $request->all(), 'query' => $request->query()]);
+        // dd('here');
 
         $request_id = $request->input('mer_txnid') ?? $request->input('request_id') ?? $request->query('request_id') ?? null;
-        // dd($request_id);
+
         if (! $request_id) {
             Log::warning('AmarPay success called without transaction id', ['request' => $request->all(), 'query' => $request->query()]);
             return redirect()->route('citizen.invoices.index')->with('error', 'Invalid AmarPay response (missing transaction id).');
@@ -133,22 +133,47 @@ class PaymentController extends Controller
             ->latest()
             ->first();
 
-        if (! $transaction) {
-            // Log::warning('AmarPay: transaction not found', ['request_id' => $request_id, 'payload' => $data]);
-        } else {
-            $transaction->update([
-                'status' => $data['status'] ?? ($data['payment_status'] ?? 'unknown'),
-                'response_payload' => json_encode($data)
-            ]);
 
-            $successStates = ['SUCCESS', 'Completed', 'success'];
-            if (isset($data['status']) && in_array($data['status'], $successStates, true)) {
+        if ($transaction) {
+
+
+            // Check AmarPay response for success
+            if (
+                (isset($data['pay_status']) && $data['pay_status'] === 'Successful') &&
+                (isset($data['status_code']) && $data['status_code'] === '2') &&
+                (isset($data['status_title']) && $data['status_title'] === 'Successful Transaction')
+            ) {
+
+                $transaction->update([
+                    'status' => 'success',
+                    'response_payload' => json_encode($data)
+                ]);
+                // dd($data);
                 $invoice = $transaction->invoice;
-                dd('here');
-                Log::warning('AmarPay: transaction success',['invoice' => $invoice]);
+                // dd( $invoice);
+
+                Invoice::where('id', $invoice->id)->update([
+                    'payment_status' => 'paid',
+                    'payment_method' => $data['payment_processor'],
+                    'status' => 'approved',
+                    'transaction_id' => $data['bank_trxid'],
+                    'payment_gateway' => $data['payment_type'],
+                    'paid_at' => now()
+                ]);
+                Application::where('invoice_id', $invoice->id)->update([
+                    'payment_status' => 'paid',
+                    'paid_at' => now()
+                ]);
+
+                Log::warning('AmarPay: transaction success', ['invoice' => $invoice]);
                 if ($invoice && ! $invoice->isPaid()) {
                     $invoice->markAsPaid('aamarpay', $transaction->tran_id, $data);
                 }
+            } else {
+                $transaction->update([
+                    'status' => 'failed',
+                    'response_payload' => json_encode($data)
+                ]);
             }
         }
 
@@ -157,7 +182,7 @@ class PaymentController extends Controller
 
     public function aMarPayCallback(Request $request)
     {
-        Log::info('AmarPay callback received', ['request' => $request->all()]);
+        // Log::info('AmarPay callback received', ['request' => $request->all()]);
 
         $request_id = $request->input('request_id') ?? $request->input('mer_txnid') ?? null;
 
@@ -176,7 +201,7 @@ class PaymentController extends Controller
     }
 
     public function fail(Request $request){
-        Log::info('AmarPay payment failed', ['request' => $request->all()]);
+        // Log::info('AmarPay payment failed', ['request' => $request->all()]);
         return redirect()->route('citizen.invoices.index')->with('error', 'Payment failed or was declined.');
     }
 
