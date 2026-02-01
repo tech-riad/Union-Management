@@ -31,138 +31,151 @@ class PaymentController extends Controller
             abort(403);
         }
 
-        $amount   = $invoice->amount;
-        $currency = config('aamarpay.currency');
-        $tran_id  = 'inv'.$invoice->id.'-'.Str::random(8);
 
-        $store_id      = config('aamarpay.store_id');
+        $amount = $invoice->amount;
+        $currency = config('aamarpay.currency', 'BDT');
+
+        $tran_id = 'inv'.$invoice->id.'-'.Str::random(8);
+
+        $store_id = config('aamarpay.store_id');
         $signature_key = config('aamarpay.signature_key');
-        $endpoint      = config('aamarpay.live_url');
+        $endpoint =  config('aamarpay.live_url');
 
-        $rawPhone = '01315902875';
-        $phone    = preg_replace('/\D+/', '', (string) $rawPhone);
+        $rawPhone = '01750114128';
+        $phone = preg_replace('/\D+/', '', (string) $rawPhone);
 
         if (empty($phone) || strlen($phone) < 10) {
-            return back()->with('error', 'Valid phone number required for AmarPay.');
+            Log::warning('AmarPay: invalid or missing customer phone', ['invoice_id' => $invoice->id, 'raw' => $rawPhone]);
+            return redirect()->back()->with('error', 'Valid phone number is required to pay with AmarPay. Please update your profile and try again.');
         }
 
         $payload = [
-            'store_id'       => $store_id,
-            'tran_id'        => $tran_id,
-            'success_url'    => route('citizen.payments.amarpay.uni.manage.success'),
-            'fail_url'       => route('citizen.payments.amarpay.uni.manage.fail'),
-            'cancel_url'     => route('citizen.payments.amarpay.uni.manage.cancel'),
-            'amount'         => (string) $amount,
-            'currency'       => $currency,
-            'signature_key'  => $signature_key,
-            'desc'           => "Invoice #{$invoice->id} Payment",
-            'cus_name'       => optional($invoice->user)->name ?? 'Customer',
-            'cus_email'      => optional($invoice->user)->email,
-            'cus_phone'      => $phone,
-            'type'           => 'json',
+            'store_id' => $store_id,
+            'tran_id' => $tran_id,
+            'success_url' => route('citizen.payments.amarpay.uni.manage.success'),
+            'fail_url' => route('citizen.payments.amarpay.uni.manage.fail'),
+            'cancel_url' => route('citizen.payments.amarpay.uni.manage.cancel'),
+            'amount' => (string) $amount,
+            'currency' => $currency,
+            'signature_key' => $signature_key,
+            'desc' => "Invoice #{$invoice->id} payment",
+            'cus_name' => optional($invoice->user)->name ?? 'Customer',
+            'cus_email' => optional($invoice->user)->email ?? null,
+            'cus_phone' => $phone,
+            'type' => 'json'
         ];
+
+        // dd($payload);
 
         try {
             $response = Http::timeout(30)->post($endpoint, $payload);
         } catch (\Exception $e) {
-            Log::error('AmarPay Live Init Failed', ['error' => $e->getMessage()]);
-            return back()->with('error', 'Payment initiation failed.');
+            Log::error('AmarPay: request failed', ['error' => $e->getMessage()]);
+            return redirect()->back()->with('error', 'Could not initiate AmarPay payment. Please try again later.');
         }
 
         $data = $response->json();
+        // dd($data);
 
-        AamarpayTransaction::create([
-            'invoice_id'       => $invoice->id,
-            'tran_id'          => $tran_id,
-            'amount'           => $amount,
-            'currency'         => $currency,
-            'status'           => $data['status'] ?? 'initiated',
-            'request_payload'  => json_encode($payload),
+        // store initiation record
+        $transaction = AamarpayTransaction::create([
+            'invoice_id' => $invoice->id,
+            'tran_id' => $tran_id,
+            'amount' => $amount,
+            'currency' => $currency,
+            'status' => $data['status'] ?? 'initiated',
+            'request_payload' => json_encode($payload),
             'response_payload' => json_encode($data),
         ]);
+        // dd($transaction);
 
         if (!empty($data['payment_url'])) {
             return redirect()->away($data['payment_url']);
         }
 
-        return back()->with('error', 'Unable to redirect to AmarPay.');
+        return redirect()->back()->with('error', 'Failed to create AmarPay payment.');
     }
 
     public function success(Request $request)
     {
-        $request_id = $request->input('mer_txnid')
-            ?? $request->input('request_id');
+        // dd('here');
 
-        if (!$request_id) {
-            return redirect()
-                ->route('citizen.invoices.index')
-                ->with('error', 'Invalid payment response.');
+        $request_id = $request->input('mer_txnid') ?? $request->input('request_id') ?? $request->query('request_id') ?? null;
+
+        if (! $request_id) {
+            Log::warning('AmarPay success called without transaction id', ['request' => $request->all(), 'query' => $request->query()]);
+            return redirect()->route('citizen.invoices.index')->with('error', 'Invalid AmarPay response (missing transaction id).');
         }
 
+        $store_id = config('aamarpay.store_id');
+        $signature_key = config('aamarpay.signature_key');
         $verifyUrl = config('aamarpay.verify_live_url');
 
         try {
             $response = Http::timeout(30)->get($verifyUrl, [
-                'request_id'    => $request_id,
-                'store_id'      => config('aamarpay.store_id'),
-                'signature_key' => config('aamarpay.signature_key'),
-                'type'          => 'json',
+                'request_id' => $request_id,
+                'store_id' => $store_id,
+                'signature_key' => $signature_key,
+                'type' => 'json'
             ]);
         } catch (\Exception $e) {
-            return redirect()
-                ->route('citizen.invoices.index')
-                ->with('error', 'Payment verification failed.');
+            return redirect()->route('citizen.invoices.index')->with('error', 'Could not verify payment.');
         }
 
         $data = $response->json();
 
-        $transaction = AamarpayTransaction::where('tran_id', $request_id)->first();
+        $transaction = AamarpayTransaction::where('tran_id', $request_id)
+            ->orWhere('tran_id', $request->input('tran_id'))
+            ->latest()
+            ->first();
 
-        if (!$transaction) {
-            return redirect()->route('citizen.invoices.index');
+
+        if ($transaction) {
+
+
+            // Check AmarPay response for success
+            if (
+                (isset($data['pay_status']) && $data['pay_status'] === 'Successful') &&
+                (isset($data['status_code']) && $data['status_code'] === '2') &&
+                (isset($data['status_title']) && $data['status_title'] === 'Successful Transaction')
+            ) {
+
+                $transaction->update([
+                    'status' => 'success',
+                    'response_payload' => json_encode($data)
+                ]);
+                // dd($data);
+                $invoice = $transaction->invoice;
+                // dd( $invoice);
+
+                Invoice::where('id', $invoice->id)->update([
+                    'payment_status' => 'paid',
+                    'payment_method' => $data['payment_processor'],
+                    'status' => 'approved',
+                    'transaction_id' => $data['bank_trxid'],
+                    'payment_gateway' => $data['payment_type'],
+                    'paid_at' => now()
+                ]);
+                Application::where('invoice_id', $invoice->id)->update([
+                    'payment_status' => 'paid',
+                    'status' => 'approved',
+                    'paid_at' => now()
+                ]);
+
+                Log::warning('AmarPay: transaction success', ['invoice' => $invoice]);
+                if ($invoice && ! $invoice->isPaid()) {
+                    $invoice->markAsPaid('aamarpay', $transaction->tran_id, $data);
+                }
+            } else {
+                $transaction->update([
+                    'status' => 'failed',
+                    'response_payload' => json_encode($data)
+                ]);
+            }
         }
 
-        if (
-            ($data['pay_status'] ?? '') === 'Successful' &&
-            ($data['status_code'] ?? '') == '2'
-        ) {
-            $transaction->update([
-                'status' => 'success',
-                'response_payload' => json_encode($data),
-            ]);
-
-            $invoice = $transaction->invoice;
-
-            $invoice->update([
-                'payment_status'  => 'paid',
-                'status'          => 'approved',
-                'payment_method'  => 'aamarpay',
-                'transaction_id'  => $data['bank_trxid'] ?? null,
-                'payment_gateway' => $data['payment_type'] ?? null,
-                'paid_at'         => now(),
-            ]);
-
-            Application::where('invoice_id', $invoice->id)->update([
-                'payment_status' => 'paid',
-                'status'         => 'approved',
-                'paid_at'        => now(),
-            ]);
-
-            return redirect()
-                ->route('citizen.invoices.index')
-                ->with('success', 'Payment successful.');
-        }
-
-        $transaction->update([
-            'status' => 'failed',
-            'response_payload' => json_encode($data),
-        ]);
-
-        return redirect()
-            ->route('citizen.invoices.index')
-            ->with('error', 'Payment failed.');
+        return redirect()->route('citizen.invoices.index')->with('success', 'Payment processed.');
     }
-
 
     public function aMarPayCallback(Request $request)
     {
