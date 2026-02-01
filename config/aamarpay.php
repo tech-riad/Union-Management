@@ -1,12 +1,9 @@
 <?php
 
 return [
-    'sandbox' => env('AAMARPAY_SANDBOX', true),
-    'live_url' => env('AAMARPAY_LIVE_URL', 'https://secure.aamarpay.com/jsonpost.php'),
-    'verify_live_url' => env('AAMARPAY_VERIFY_LIVE_URL', 'http://secure.aamarpay.com/api/v1/trxcheck/request.php'),
-
-    'store_id' => env('AAMARPAY_STORE_ID', 'aamarpaytest'),
-    'signature_key' => env('AAMARPAY_SIGNATURE_KEY', 'dbb74894e82415a2f7ff0ec3a97e4183'),
-
+    'store_id' => env('AAMARPAY_STORE_ID'),
+    'signature_key' => env('AAMARPAY_SIGNATURE_KEY'),
+    'live_url' => env('AAMARPAY_LIVE_URL'),
+    'verify_live_url' => env('AAMARPAY_VERIFY_LIVE_URL'),
     'currency' => env('AAMARPAY_CURRENCY', 'BDT'),
 ];
