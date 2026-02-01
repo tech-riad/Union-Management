@@ -39,9 +39,7 @@ class PaymentController extends Controller
 
         $store_id = config('aamarpay.store_id');
         $signature_key = config('aamarpay.signature_key');
-        $endpoint = config('aamarpay.sandbox', true)
-            ? config('aamarpay.sandbox_url')
-            : config('aamarpay.live_url');
+        $endpoint =  config('aamarpay.live_url');
 
         $rawPhone = '01750114128';
         $phone = preg_replace('/\D+/', '', (string) $rawPhone);
@@ -111,9 +109,7 @@ class PaymentController extends Controller
 
         $store_id = config('aamarpay.store_id');
         $signature_key = config('aamarpay.signature_key');
-        $verifyUrl = config('aamarpay.sandbox', true)
-            ? config('aamarpay.verify_sandbox_url')
-            : config('aamarpay.verify_live_url');
+        $verifyUrl = config('aamarpay.verify_live_url');
 
         try {
             $response = Http::timeout(30)->get($verifyUrl, [

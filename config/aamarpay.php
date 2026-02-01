@@ -2,10 +2,6 @@
 
 return [
     'sandbox' => env('AAMARPAY_SANDBOX', true),
-
-    'sandbox_url' => env('AAMARPAY_SANDBOX_URL', 'https://sandbox.aamarpay.com/jsonpost.php'),
-    'verify_sandbox_url' => env('AAMARPAY_VERIFY_SANDBOX_URL', 'http://sandbox.aamarpay.com/api/v1/trxcheck/request.php'),
-
     'live_url' => env('AAMARPAY_LIVE_URL', 'https://secure.aamarpay.com/jsonpost.php'),
     'verify_live_url' => env('AAMARPAY_VERIFY_LIVE_URL', 'http://secure.aamarpay.com/api/v1/trxcheck/request.php'),
 
