@@ -39,7 +39,7 @@ class PaymentController extends Controller
         $signature_key = config('aamarpay.signature_key');
         $endpoint      = config('aamarpay.live_url');
 
-        $rawPhone = '01750114128';
+        $rawPhone = '01315902875';
         $phone    = preg_replace('/\D+/', '', (string) $rawPhone);
 
         if (empty($phone) || strlen($phone) < 10) {
