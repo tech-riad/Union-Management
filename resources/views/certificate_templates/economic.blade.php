@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Trade License</title>
+<title>{{ $certificate_type_bangla }} - {{ $certificate_number }}</title>
 
 <style>
   body {
@@ -137,7 +137,7 @@
 
 <div class="certificate">
 
-  <div class="watermark">Financial</div>
+  {{-- <div class="watermark">{{ $watermark_text ?? 'Watermark Text' }}</div> --}}
 
   <table class="header">
     <tr>
@@ -145,29 +145,29 @@
 
       <td class="center">
         <div class="govt">Government of the People's Republic of Bangladesh</div>
-        <div class="union">Telihati Union Parishad</div>
-        <div class="location">Upazila: Gazipur Sadar, District: Gazipur</div>
+        <div class="union">{{$union_name ?? 'নাই'}}</div>
+        <div class="location">{{$union_address ?? 'নাই'}}</div>
 
         <div class="title">Financial Insolvency Certificate</div>
       </td>
 
-      <td class="photo">PHOTO</td>
+      <td class="photo">{{$user_profile->profile_photo}}</td>
     </tr>
   </table>
 
   <table class="meta">
     <tr>
-      <td>License No: <b>TL-2024-00125</b></td>
-      <td style="text-align:right">Issue Date: <b>20-01-2024</b></td>
+      <td>License No: <b>{{$certificate_number}}</b></td>
+      <td style="text-align:right">Issue Date: <b>{{$issue_date}}</b></td>
     </tr>
   </table>
 
   <table class="info">
-    <tr><td>Name</td><td>ABC Traders</td></tr>
-    <tr><td>Father's Name</td><td> Name</td></tr>
-    <tr><td>Occupation</td><td> job</td></tr>
-    <tr><td>Monthly Income</td><td> $$ </td></tr>
-    <tr><td>Address</td><td>Village, Union, Upazila, District</td></tr>
+    <tr><td>Name</td><td>{{$user->name}}</td></tr>
+    <tr><td>Father's Name</td><td> {{$user_profile->father_name ?? 'N/A'}}</td></tr>
+    <tr><td>Occupation</td><td> {{$user->occupation}}</td></tr>
+    <tr><td>Monthly Income</td><td> {{$user->monthly_income}} </td></tr>
+    <tr><td>Address</td><td>{{$user->address}}</td></tr>
     <tr><td>National ID (NID)</td><td>XXXXXXXXXX</td></tr>
     <tr><td>Validity</td><td>01 January 2024 – 31 December 2027</td></tr>
   </table>

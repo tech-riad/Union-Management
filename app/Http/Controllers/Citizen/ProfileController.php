@@ -67,7 +67,7 @@ class ProfileController extends Controller
             'permanent_address' => 'required|string|max:255',
             'village' => 'nullable|string|max:255',
             'ward' => 'nullable|string|max:10',
-            
+
 
             // Other
             'occupation' => 'required|string|max:100',
@@ -100,6 +100,7 @@ class ProfileController extends Controller
         } else {
             $user->profile()->create($data + ['is_complete' => true]);
         }
+        // dd($data);
 
         return redirect()->route('citizen.dashboard')
                          ->with('success', 'প্রোফাইল সফলভাবে সম্পূর্ন হয়েছে ✅');

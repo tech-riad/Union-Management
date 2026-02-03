@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Citizenship Certificate</title>
+<title>{{ $certificate_type }}-{{ $certificate_number }}</title>
 
 <style>
   body {
@@ -144,7 +144,7 @@
 
 <div class="certificate">
 
-  <div class="watermark">Citizenship</div>
+  {{-- <div class="watermark">Citizenship</div> --}}
 
   <!-- HEADER -->
   <table class="header">
@@ -153,10 +153,10 @@
 
       <td class="center">
         <div class="govt">Government of the People's Republic of Bangladesh</div>
-        <div class="union">Telihati Union Parishad</div>
-        <div class="location">Upazila: Gazipur Sadar, District: Gazipur</div>
+        <div class="union">{{$union_name ?? 'নাই'}}</div>
+        <div class="location">{{$union_address ?? 'নাই'}}</div>
 
-        <div class="title">Citizenship Certificate</div>
+        <div class="title">{{ $certificate_type_bangla }}</div>
       </td>
 
       <td class="photo">PHOTO</td>

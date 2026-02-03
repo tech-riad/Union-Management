@@ -94,6 +94,7 @@ class PdfController extends Controller
      */
     private function prepareCertificateData($application, $applicantData, $user, $certificateType)
     {
+        // dd($application, $applicantData, $user, $certificateType);
         // Format dates
         $issueDate = $application->approved_at
             ? $application->approved_at->format('d-m-Y')
@@ -134,6 +135,7 @@ class PdfController extends Controller
             // Applicant information
             'applicant' => $applicant,
             'user' => $user,
+            'user_profile' => $user->profile,
 
             // Certificate information
             'certificate_number' => $application->certificate_number ?? 'CERT-' . $application->id,

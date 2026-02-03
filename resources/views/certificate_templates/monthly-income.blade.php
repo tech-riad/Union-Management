@@ -141,14 +141,14 @@
 
   <table class="header">
     <tr>
-      <td class="qr">{{$qr_code_data}}</td>
+      <td class="qr">QR CODE</td>
 
       <td class="center">
         <div class="govt">Government of the People's Republic of Bangladesh</div>
-        <div class="union">{{$union_name}}</div>
-        <div class="location">{{$union_address}}</div>
+        <div class="union">{{$union_name ?? 'নাই'}}</div>
+        <div class="location">{{$union_address ?? 'নাই'}}</div>
 
-        <div class="title">Monthly Income Certificate</div>
+        <div class="title">{{ $certificate_type_bangla }}</div>
       </td>
 
       <td class="photo">PHOTO</td>

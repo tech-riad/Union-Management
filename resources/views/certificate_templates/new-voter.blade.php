@@ -145,10 +145,10 @@
 
       <td class="center">
         <div class="govt">Government of the People's Republic of Bangladesh</div>
-        <div class="union">Telihati Union Parishad</div>
-        <div class="location">Upazila: Gazipur Sadar, District: Gazipur</div>
+        <div class="union">{{$union_name ?? 'নাই'}}</div>
+        <div class="location">{{$union_address ?? 'নাই'}}</div>
 
-        <div class="title">New Voter Certificate</div>
+        <div class="title">{{ $certificate_type_bangla }}</div>
       </td>
 
       <td class="photo">PHOTO</td>
