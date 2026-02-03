@@ -157,15 +157,21 @@
 
   <table class="meta">
     <tr>
-      <td>সার্টিফিকেট নম্বর: <b>LC-2025-00125</b></td>
-      <td style="text-align:right">প্রদানের তারিখ: <b>20-01-2025</b></td>
+      <td>সার্টিফিকেট নম্বর: <b>{{ $certificate_number }}</b></td>
+      <td style="text-align:right">প্রদানের তারিখ: <b>{{ $issue_date }}</b></td>
     </tr>
   </table>
 
   <table class="info">
-    <tr><td>Name</td><td>ABC</td></tr>
-    <tr><td>Father's Name</td><td> Name</td></tr>
-    <tr><td>Mother's Name</td><td> Name</td></tr>
+    <tr><td>Name</td><td>{{ $applicant->name_bangla ?: 'নাই' }}</td></tr>
+    <tr>
+                <td>পিতার নাম</td>
+                <td>{{ $applicant->father_name_bangla ?: 'নাই' }}</td>
+            </tr>
+    <tr>
+                <td>মাতার নাম</td>
+                <td>{{ $applicant->mother_name_bangla ?: 'নাই' }}</td>
+            </tr>
     <tr><td>Gender</td><td>Male / Female</td></tr>
     <tr><td>Address</td><td>Village, Union, Upazila, District</td></tr>
     <tr><td>National ID (NID)</td><td>XXXXXXXXXX</td></tr>

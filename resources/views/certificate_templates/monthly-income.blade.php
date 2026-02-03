@@ -157,7 +157,7 @@
 
   <table class="meta">
     <tr>
-      <td>License No: <b>{{ $certificate_number }}</b></td>
+      <td>লাইসেন্স নম্বর: <b>{{ $certificate_number }}</b></td>
       <td style="text-align:right">প্রদানের তারিখ: <b>{{ $issue_date }}</b></td>
     </tr>
   </table>

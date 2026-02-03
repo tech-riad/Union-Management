@@ -157,7 +157,7 @@
 
   <table class="meta">
     <tr>
-      <td>সার্টিফিকেট নম্বর: <b>HC-2024-00125</b></td>
+      <td>সার্টিফিকেট নম্বর: <b>{{ $certificate_number }}</b></td>
       <td style="text-align:right">প্রদানের তারিখ: <b>{{ $issue_date }}</b></td>
     </tr>
   </table>

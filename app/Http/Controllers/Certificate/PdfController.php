@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\CertificateApplication;
 use App\Models\CertificateType;
+use App\Models\UnionSetting;
 use App\Models\User;
 use Mpdf\Mpdf;
 use Mpdf\Config\ConfigVariables;
@@ -94,6 +95,7 @@ class PdfController extends Controller
      */
     private function prepareCertificateData($application, $applicantData, $user, $certificateType)
     {
+        // dd($unionInfo);
         // dd($application, $applicantData, $user, $certificateType);
         // Format dates
         $issueDate = $application->approved_at
@@ -122,13 +124,16 @@ class PdfController extends Controller
         ], $applicantData);
 
         // Union information (এই তথ্যগুলো database থেকে নিয়ে আসতে পারেন)
+        $unionInfo = UnionSetting::first();
+        // dd($unionInfo);
+
         $unionInfo = [
-            'name' => 'আপনার ইউনিয়ন পরিষদ',
-            'address' => 'ইউনিয়ন পরিষদ, আপনার থানা, আপনার জেলা',
-            'chairman' => 'জনাব মোঃ আব্দুল করিম',
-            'secretary' => 'জনাব মোঃ রফিকুল ইসলাম',
-            'phone' => '০১৭১২৩৪৫৬৭৮',
-            'email' => 'union@example.com',
+            'name' => $unionInfo->union_name_bangla ?? 'আপনার ইউনিয়ন পরিষদ',
+            'address' => $unionInfo->address_bangla ?? 'ইউনিয়ন পরিষদ, আপনার থানা, আপনার জেলা',
+            'chairman' => $unionInfo->chairman_name ?? 'জনাব মোঃ আব্দুল করিম',
+            'secretary' => $unionInfo->secretary_name ?? 'জনাব মোঃ রফিকুল ইসলাম',
+            'phone' => $unionInfo->chairman_phone ?? '০১৭১২৩৪৫৬৭৮',
+            'email' => $unionInfo->email ?? 'union@example.com',
         ];
 
         return [
@@ -184,7 +189,14 @@ class PdfController extends Controller
         }
 
         try {
-            // Render the blade template
+            $qr_code_data = "http://127.0.0.1:8000/verify/" . $data['certificate_number'];
+
+
+            $qr = \SimpleSoftwareIO\QrCode\Facades\QrCode::size(100)->generate($qr_code_data);
+
+            $qr = preg_replace('/<\?xml.*?\?>/', '', $qr);
+            $data['qr_code_image'] = $qr;
+            // dd($data);
             $html = view($templateView, $data)->render();
 
             // Fix relative paths for images

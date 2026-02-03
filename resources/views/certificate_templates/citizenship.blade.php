@@ -152,7 +152,9 @@
         <!-- HEADER -->
         <table class="header">
             <tr>
-                <td class="qr">QR CODE</td>
+                <td class="qr" >
+                    {!! $qr_code_image !!}
+                </td>
 
                 <td class="center">
                     <div class="govt">গণপ্রজাতন্ত্রী বাংলাদেশ সরকার</div>
@@ -200,7 +202,7 @@
                 <td>স্থায়ী ঠিকানা</td>
                 <td>
                     গ্রাম: _____, ডাকঘর: _____ <br>
-                    ইউনিয়ন: টেলিহাটি, উপজেলা: গাজীপুর সদর, জেলা: গাজীপুর
+                    {{$union_address ?? 'নাই'}}
                 </td>
             </tr>
         </table>
@@ -208,10 +210,7 @@
 
         <!-- DECLARATION -->
         <div class="note">
-            This is to certify that the above-mentioned person is a permanent resident and a lawful citizen of
-            Telihati Union Parishad under Gazipur Sadar Upazila, Gazipur District.
-            According to the records of this Union Parishad, the information stated above is true and correct
-            to the best of our knowledge.
+            এ মর্মে প্রত্যয়ন করা যাচ্ছে যে, উপরোক্ত ব্যক্তি গাজীপুর জেলার গাজীপুর সদর উপজেলার অন্তর্গত তেলিহাটি ইউনিয়ন পরিষদের একজন স্থায়ী বাসিন্দা ও বৈধ নাগরিক। এই ইউনিয়ন পরিষদের রেকর্ড অনুযায়ী, উপর্যুক্ত তথ্য আমাদের সর্বোচ্চ জ্ঞান ও বিশ্বাস অনুযায়ী সত্য ও সঠিক।
         </div>
 
         <!-- FOOTER -->

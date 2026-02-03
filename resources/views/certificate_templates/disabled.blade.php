@@ -137,11 +137,13 @@
 
 <div class="certificate">
 
-  <div class="watermark">Disability</div>
+  {{-- <div class="watermark">Disability</div> --}}
 
   <table class="header">
     <tr>
-      <td class="qr">QR CODE</td>
+      <td class="qr" >
+        {!! $qr_code_image !!}
+      </td>
 
       <td class="center">
         <div class="govt">গণপ্রজাতন্ত্রী বাংলাদেশ সরকার</div>
@@ -157,15 +159,21 @@
 
   <table class="meta">
     <tr>
-      <td>License No: <b>TL-2024-00125</b></td>
+      <td>লাইসেন্স নম্বর: <b>{{ $certificate_number }}</b></td>
       <td style="text-align:right">প্রদানের তারিখ: <b>{{ $issue_date }}</b></td>
     </tr>
   </table>
 
   <table class="info">
-    <tr><td>Name</td><td>ABC</td></tr>
-    <tr><td>Father's Name</td><td> Name</td></tr>
-    <tr><td>Mother's Name</td><td> Name</td></tr>
+    <tr><td>Name</td><td>{{ $applicant->name_bangla ?: 'নাই' }}</td></tr>
+    <tr>
+                <td>পিতার নাম</td>
+                <td>{{ $applicant->father_name_bangla ?: 'নাই' }}</td>
+            </tr>
+    <tr>
+                <td>মাতার নাম</td>
+                <td>{{ $applicant->mother_name_bangla ?: 'নাই' }}</td>
+            </tr>
     <tr><td>Gender</td><td>Male / Female</td></tr>
     <tr><td>disability Type</td><td>N / A</td></tr>
     <tr><td>Percentage (if any)</td><td>N / A</td></tr>
