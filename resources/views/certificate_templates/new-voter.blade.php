@@ -144,7 +144,7 @@
       <td class="qr">QR CODE</td>
 
       <td class="center">
-        <div class="govt">Government of the People's Republic of Bangladesh</div>
+        <div class="govt">গণপ্রজাতন্ত্রী বাংলাদেশ সরকার</div>
         <div class="union">{{$union_name ?? 'নাই'}}</div>
         <div class="location">{{$union_address ?? 'নাই'}}</div>
 
@@ -158,7 +158,7 @@
   <table class="meta">
     <tr>
       <td>License No: <b>TL-2024-00125</b></td>
-      <td style="text-align:right">Issue Date: <b>20-01-2024</b></td>
+      <td style="text-align:right">প্রদানের তারিখ: <b>{{ $issue_date }}</b></td>
     </tr>
   </table>
 

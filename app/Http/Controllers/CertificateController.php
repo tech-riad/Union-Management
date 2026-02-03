@@ -17,26 +17,26 @@ class CertificateController extends Controller
     {
         $application = CertificateApplication::with(['user', 'certificateType'])
             ->findOrFail($id);
-        
+
         // Check if application is approved
         if ($application->status !== 'approved') {
             abort(403, 'Certificate is not approved yet.');
         }
-        
+
         // Generate verification URL - Use direct URL to avoid route issues
         $verificationUrl = url('/verify/' . $application->certificate_number);
-        
+
         // Generate QR code with verification URL - USING SVG FORMAT (no imagick needed)
         $qrCodeBase64 = $this->generateQRCode($verificationUrl);
-        
+
         // Get form data
         $formData = $this->parseJsonData($application->form_data);
-        
+
         // Calculate validity date (1 year from approval)
-        $validityDate = $application->approved_at 
+        $validityDate = $application->approved_at
             ? $application->approved_at->addYear()->format('d-m-Y')
             : now()->addYear()->format('d-m-Y');
-        
+
         // Prepare template data
         $data = [
             'application' => $application,
@@ -59,19 +59,19 @@ class CertificateController extends Controller
                 'birth_place_bangla' => $formData['birth_place_bangla'] ?? '',
             ],
         ];
-        
+
         // Determine which template to use based on certificate type
         $templateName = $this->getTemplateName($application->certificate_type_id);
-        
+
         // Debug: Check if template exists
         if (!view()->exists("certificate_templates.{$templateName}")) {
             \Log::error("Template not found: certificate_templates.{$templateName}");
             $templateName = 'নাগরিকত্ব-সনদ';
         }
-        
+
         // Render the view
         $html = view("certificate_templates.{$templateName}", $data)->render();
-        
+
         // Configure mPDF with SIMPLER settings
         $mpdfConfig = [
             'mode' => 'utf-8',
@@ -88,7 +88,7 @@ class CertificateController extends Controller
             'autoScriptToLang' => true,
             'autoLangToFont' => true,
         ];
-        
+
         // Check if Bangla font exists
         $fontPath = public_path('fonts/solaimanlipi.ttf');
         if (file_exists($fontPath)) {
@@ -102,25 +102,25 @@ class CertificateController extends Controller
             ];
             $mpdfConfig['default_font'] = 'solaimanlipi';
         }
-        
+
         $mpdf = new Mpdf($mpdfConfig);
-        
+
         // Set PDF metadata
         $mpdf->SetTitle('নাগরিকত্ব সনদ - ' . $application->certificate_number);
         $mpdf->SetAuthor('ইউনিয়ন পরিষদ');
-        
+
         // Write HTML content
         $mpdf->WriteHTML($html);
-        
+
         // Output PDF
         $fileName = 'নাগরিকত্ব-সনদ-' . $application->certificate_number . '.pdf';
-        
+
         return response($mpdf->Output($fileName, 'S'), 200, [
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
         ]);
     }
-    
+
     /**
      * Generate QR Code using SVG format (no imagick required)
      */
@@ -135,17 +135,17 @@ class CertificateController extends Controller
                 ->color(0, 0, 0)
                 ->backgroundColor(255, 255, 255)
                 ->generate($url);
-            
+
             return 'data:image/svg+xml;base64,' . base64_encode($qrCode);
-            
+
         } catch (\Exception $e) {
             \Log::error('QR Code Generation Error: ' . $e->getMessage());
-            
+
             // Fallback SVG if QR generation fails
             return $this->generateFallbackQR($url);
         }
     }
-    
+
     /**
      * Generate fallback QR code if main generation fails
      */
@@ -156,19 +156,19 @@ class CertificateController extends Controller
         <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
             <rect width="100%" height="100%" fill="#ffffff"/>
             <rect x="10" y="10" width="180" height="180" fill="none" stroke="#000000" stroke-width="2"/>
-            
+
             <!-- QR Code Pattern -->
             <rect x="40" y="40" width="20" height="20" fill="#000000"/>
             <rect x="80" y="40" width="20" height="20" fill="#000000"/>
             <rect x="120" y="40" width="20" height="20" fill="#000000"/>
-            
+
             <rect x="40" y="80" width="20" height="20" fill="#000000"/>
             <rect x="120" y="80" width="20" height="20" fill="#000000"/>
-            
+
             <rect x="40" y="120" width="20" height="20" fill="#000000"/>
             <rect x="80" y="120" width="20" height="20" fill="#000000"/>
             <rect x="120" y="120" width="20" height="20" fill="#000000"/>
-            
+
             <!-- Text -->
             <text x="100" y="170" text-anchor="middle" fill="#000000" font-family="Arial" font-size="12">
                 VERIFY
@@ -177,21 +177,21 @@ class CertificateController extends Controller
                 ' . substr($url, 0, 15) . '...
             </text>
         </svg>';
-        
+
         return 'data:image/svg+xml;base64,' . base64_encode($svg);
     }
-    
+
     /**
      * Get template name based on certificate type
      */
     private function getTemplateName($certificateTypeId)
     {
         $certificateType = CertificateType::find($certificateTypeId);
-        
+
         if (!$certificateType) {
             return 'নাগরিকত্ব-সনদ';
         }
-        
+
         // Map certificate types to template names
         $templateMap = [
             'নাগরিকত্ব সনদ' => 'নাগরিকত্ব-সনদ',
@@ -201,10 +201,10 @@ class CertificateController extends Controller
             'মৃত্যু সনদ' => 'মৃত্যু-সনদ',
             'স্বামী/স্ত্রীর মৃত্যু সনদ' => 'স্বামী-স্ত্রীর-মৃত্যু-সনদ',
         ];
-        
+
         return $templateMap[$certificateType->name] ?? 'নাগরিকত্ব-সনদ';
     }
-    
+
     /**
      * Certificate Verification Page
      */
@@ -214,14 +214,14 @@ class CertificateController extends Controller
         if (!$cid && !$request->has('cid')) {
             return $this->verifyForm();
         }
-        
+
         // Get certificate number from parameter or request
         $certificateNumber = $cid ?? $request->input('cid') ?? $request->query('cid');
-        
+
         if (!$certificateNumber) {
             return redirect()->route('certificate.verify.form');
         }
-        
+
         // Find the application
         $application = CertificateApplication::with([
             'user:id,name,email',
@@ -231,16 +231,16 @@ class CertificateController extends Controller
         ->where('certificate_number', $certificateNumber)
         ->where('status', 'approved')
         ->first();
-        
+
         if (!$application) {
             return view('certificates.verify-invalid', [
                 'certificateNumber' => $certificateNumber,
                 'error' => 'সনদটি পাওয়া যায়নি বা অনুমোদিত নয়'
             ]);
         }
-        
+
         $formData = $this->parseJsonData($application->form_data);
-        
+
         // Prepare data for verification page
         $verificationData = [
             'application' => $application,
@@ -252,10 +252,10 @@ class CertificateController extends Controller
             'issueDate' => $application->approved_at->format('d F, Y'),
             'validityDate' => $application->approved_at->addYear()->format('d F, Y'),
         ];
-        
+
         return view('certificates.verify', $verificationData);
     }
-    
+
     /**
      * Public verification form
      */
@@ -263,7 +263,7 @@ class CertificateController extends Controller
     {
         return view('certificates.verify-form');
     }
-    
+
     /**
      * Process verification form submission
      */
@@ -272,10 +272,10 @@ class CertificateController extends Controller
         $request->validate([
             'certificate_number' => 'required|string|max:100'
         ]);
-        
+
         return redirect()->route('certificate.verify', ['cid' => $request->certificate_number]);
     }
-    
+
     /**
      * Verify Certificate API (for external systems)
      */
@@ -285,18 +285,18 @@ class CertificateController extends Controller
             ->where('certificate_number', $certificateNumber)
             ->where('status', 'approved')
             ->first();
-        
+
         if (!$application) {
             return response()->json([
                 'success' => false,
-                'message' => 'Certificate not found or not approved',
+                'message' => 'সার্টিফিকেট নম্বরt found or not approved',
                 'certificate_number' => $certificateNumber,
                 'valid' => false
             ], 404);
         }
-        
+
         $formData = $this->parseJsonData($application->form_data);
-        
+
         return response()->json([
             'success' => true,
             'valid' => true,
@@ -322,7 +322,7 @@ class CertificateController extends Controller
             ]
         ]);
     }
-    
+
     /**
      * Helper method to parse JSON data
      */
@@ -331,23 +331,23 @@ class CertificateController extends Controller
         if (empty($data)) {
             return [];
         }
-        
+
         if (is_string($data)) {
             $decoded = json_decode($data, true);
             return json_last_error() === JSON_ERROR_NONE ? $decoded : [];
         }
-        
+
         if (is_array($data)) {
             return $data;
         }
-        
+
         if (is_object($data)) {
             return (array) $data;
         }
-        
+
         return [];
     }
-    
+
     /**
      * Test method to check QR code generation
      */
@@ -358,9 +358,9 @@ class CertificateController extends Controller
             $qrCode = QrCode::format('svg')
                 ->size(200)
                 ->generate($text);
-            
+
             $base64 = 'data:image/svg+xml;base64,' . base64_encode($qrCode);
-            
+
             return '<html>
                 <head>
                     <title>QR Code Test - SVG Format</title>
@@ -375,14 +375,14 @@ class CertificateController extends Controller
                     <h1>QR Code Test - SVG Format</h1>
                     <p class="success">✓ QR Code package is working with SVG format</p>
                     <p>Text: <strong>' . htmlspecialchars($text) . '</strong></p>
-                    
+
                     <div class="qr-container">
                         <img src="' . $base64 . '" alt="QR Code" width="200" height="200">
                     </div>
-                    
+
                     <p>Base64 Length: ' . strlen($base64) . ' characters</p>
                     <p>Format: SVG (No ImageMagick required)</p>
-                    
+
                     <h2>Next Steps:</h2>
                     <ol>
                         <li><a href="/test-pdf/1">Test PDF Generation with QR</a></li>
@@ -391,7 +391,7 @@ class CertificateController extends Controller
                     </ol>
                 </body>
             </html>';
-            
+
         } catch (\Exception $e) {
             return '<html>
                 <head>
@@ -405,19 +405,19 @@ class CertificateController extends Controller
                 <body>
                     <h1>QR Code Error</h1>
                     <p class="error">Error: ' . $e->getMessage() . '</p>
-                    
+
                     <div class="solution">
                         <h3>Solution:</h3>
                         <p>1. Make sure QR Code package is installed:</p>
                         <pre>composer require simplesoftwareio/simple-qrcode</pre>
-                        
+
                         <p>2. Clear cache:</p>
                         <pre>
 php artisan config:clear
 php artisan cache:clear
 php artisan view:clear
                         </pre>
-                        
+
                         <p>3. Check if package is loaded:</p>
                         <pre>
 composer show | grep qrcode

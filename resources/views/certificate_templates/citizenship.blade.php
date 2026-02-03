@@ -152,7 +152,7 @@
       <td class="qr">QR CODE</td>
 
       <td class="center">
-        <div class="govt">Government of the People's Republic of Bangladesh</div>
+        <div class="govt">গণপ্রজাতন্ত্রী বাংলাদেশ সরকার</div>
         <div class="union">{{$union_name ?? 'নাই'}}</div>
         <div class="location">{{$union_address ?? 'নাই'}}</div>
 
@@ -166,8 +166,8 @@
   <!-- META -->
   <table class="meta">
     <tr>
-      <td>Certificate No: <b>TP-2024-000123</b></td>
-      <td style="text-align:right">Date of Issue: <b>20-01-2024</b></td>
+      <td>সার্টিফিকেট নম্বর: <b>{{ $certificate_number }}</b></td>
+      <td style="text-align:right">Date of Issue: <b>{{ $issue_date }}</b></td>
     </tr>
   </table>
 
