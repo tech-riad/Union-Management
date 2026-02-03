@@ -6,7 +6,7 @@
 
 <style>
   body {
-    font-family: "Times New Roman", serif;
+    font-family: 'solaimanlipi', sans-serif;
     background: #fdfdfd;
     margin: 0;
     padding: 25px;
