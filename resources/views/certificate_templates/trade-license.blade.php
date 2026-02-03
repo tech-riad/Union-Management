@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Trade License</title>
+<title>{{ $certificate_type }}-{{ $certificate_number }}</title>
 
 <style>
   body {
