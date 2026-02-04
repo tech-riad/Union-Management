@@ -140,7 +140,7 @@
 
     <div class="certificate">
 
-        <div class="watermark">Second Marriage</div>
+        {{-- <div class="watermark">Second Marriage</div> --}}
 
         <table class="header">
             <tr>
@@ -170,49 +170,49 @@
         <table class="info">
             <tr>
                 <td>Applicant Name</td>
-                <td>ABC </td>
+                <td>{{ $applicant->name_bangla ?: 'নাই' }} </td>
             </tr>
             <tr>
                 <td>First Spouse Name</td>
-                <td> Name</td>
+                <td>{{  'নাই' }}</td>
             </tr>
             <tr>
                 <td>Father's Name</td>
-                <td>Father Name</td>
+                <td>{{ $applicant->father_name_bangla ?: 'নাই' }}</td>
             </tr>
             <tr>
                 <td>Mother's Name</td>
-                <td>Mother Name</td>
+                <td>{{ $applicant->mother_name_bangla ?: 'নাই' }}</td>
             </tr>
             <tr>
                 <td>Gender</td>
-                <td>Male / Female</td>
+                <td>{{ 'নাই' }}</td>
             </tr>
             <!-- <tr><td>Previous Spouse Name</td><td> Name</td></tr> -->
             <tr>
                 <td>Date of Death/Divorce</td>
-                <td> Date</td>
+                <td>{{ 'নাই' }}</td>
             </tr>
             <tr>
                 <td>Reason</td>
-                <td> NA</td>
+                <td>{{ 'নাই' }}</td>
             </tr>
             <tr>
                 <td>Address</td>
-                <td>Village, Union, Upazila, District</td>
+                <td>{{ $applicant->permanent_address_bangla ?? 'নাই' }}</td>
             </tr>
             <tr>
                 <td>National ID (NID)</td>
-                <td>XXXXXXXXXX</td>
+                <td>{{ $applicant->nid_number ?: 'নাই' }}</td>
             </tr>
             <tr>
                 <td>Validity</td>
-                <td>01 January 2024 – 31 December 2024</td>
+                <td>{{ $validity_date ?? 'নাই' }}</td>
             </tr>
         </table>
 
         <div class="note">
-            Permission is granted for second marriage as per rules.
+            স্থানীয় সরকারের প্রযোজ্য বিধি-বিধান অনুসারে আবেদনকারীর জন্য দ্বিতীয় বিবাহের অনুমতি মঞ্জুর করা হলো।
         </div>
 
         <table class="footer">
