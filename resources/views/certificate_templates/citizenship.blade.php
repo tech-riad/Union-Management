@@ -201,8 +201,8 @@
             <tr>
                 <td>স্থায়ী ঠিকানা</td>
                 <td>
-                    গ্রাম: _____, ডাকঘর: _____ <br>
-                    {{$union_address ?? 'নাই'}}
+
+                    {{$applicant->permanent_address_bangla ?? 'নাই'}}
                 </td>
             </tr>
         </table>

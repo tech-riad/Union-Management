@@ -177,7 +177,7 @@ class PdfController extends Controller
      */
     private function generateHtmlContent($certificateType, $data)
     {
-        // dd($data);
+        dd($data);
         $templateView = $certificateType->template_view_path;
         // dd($templateView);
 
