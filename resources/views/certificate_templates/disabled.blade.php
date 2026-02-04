@@ -205,19 +205,19 @@
         <table class="footer">
             <tr>
                 <td>
-                    Issued By:<br><br>
-                    Telihati Union Parishad <br>
-                    Gazipur
+                ইস্যুকারী:<br><br>
+                ইউনিয়ন পরিষদ কার্যালয় <br>
+                {{ $union_address ?: 'নাই' }}
                 </td>
 
                 <td class="sign">
-                    _______________________<br>
-                    Chairman <br>
-                    Telihati Union Parishad
+                _______________________<br>
+                চেয়ারম্যান <br>
+                {{ $union_name ?: 'নাই' }}
 
-                    <div class="seal">
-                        Official Seal
-                    </div>
+                <div class="seal">
+                    সরকারি সিল
+                </div>
                 </td>
             </tr>
         </table>
