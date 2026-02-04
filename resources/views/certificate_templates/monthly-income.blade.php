@@ -141,7 +141,9 @@
 
   <table class="header">
     <tr>
-      <td class="qr">QR CODE</td>
+      <td class="qr">
+                    {!! $qr_code_image !!}
+                </td>
 
       <td class="center">
         <div class="govt">গণপ্রজাতন্ত্রী বাংলাদেশ সরকার</div>
@@ -181,24 +183,24 @@
   </div>
 
   <table class="footer">
-    <tr>
-      <td>
-        Issued By:<br><br>
-        Telihati Union Parishad <br>
-        Gazipur
-      </td>
+            <tr>
+                <td>
+                    ইস্যুকারী:<br><br>
+                    ইউনিয়ন পরিষদ কার্যালয় <br>
+                    {{ $union_address ?: 'নাই' }}
+                </td>
 
-      <td class="sign">
-        _______________________<br>
-        Chairman <br>
-        Telihati Union Parishad
+                <td class="sign">
+                    _______________________<br>
+                    চেয়ারম্যান <br>
+                    {{ $union_name ?: 'নাই' }}
 
-        <div class="seal">
-          Official Seal
-        </div>
-      </td>
-    </tr>
-  </table>
+                    <div class="seal">
+                        সরকারি সিল
+                    </div>
+                </td>
+            </tr>
+        </table>
 
 </div>
 
