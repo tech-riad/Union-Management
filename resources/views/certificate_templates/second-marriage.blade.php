@@ -199,7 +199,7 @@
             </tr>
             <tr>
                 <td>Address</td>
-                <td>{{ $applicant->permanent_address_bangla ?? 'নাই' }}</td>
+                <td>{{ $applicant->permanent_address ?? 'নাই' }}</td>
             </tr>
             <tr>
                 <td>National ID (NID)</td>

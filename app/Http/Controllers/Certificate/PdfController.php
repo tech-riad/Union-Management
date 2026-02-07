@@ -170,6 +170,7 @@ class PdfController extends Controller
             'watermark_enabled' => $certificateType->pdf_settings['watermark_enabled'] ?? false,
             'watermark_text' => $certificateType->name . ' - ' . $unionInfo['name'],
         ];
+        // dd($data);
     }
 
     /**

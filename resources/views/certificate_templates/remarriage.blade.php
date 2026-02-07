@@ -194,7 +194,7 @@
             </tr>
             <tr>
                 <td>ঠিকানা</td>
-                <td>{{ $applicant->permanent_address_bangla ?: 'নাই' }}</td>
+                <td>{{ $applicant->permanent_address ?: 'নাই' }}</td>
             </tr>
             <tr>
                 <td>জাতীয় পরিচয়পত্র (এনআইডি)</td>

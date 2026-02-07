@@ -198,7 +198,7 @@
             </tr>
             <tr>
                 <td>স্থায়ী ঠিকানা</td>
-                <td>{{ $applicant->permanent_address_bangla ?? 'নাই' }}</td>
+                <td>{{ $applicant->permanent_address ?? 'নাই' }}</td>
             </tr>
             <tr>
                 <td>মোবাইল নম্বর</td>

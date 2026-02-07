@@ -186,7 +186,7 @@
             </tr>
             <tr>
                 <td>ঠিকানা</td>
-                <td>{{ $applicant->permanent_address_bangla ?: 'নাই' }}</td>
+                <td>{{ $applicant->permanent_address ?: 'নাই' }}</td>
             </tr>
             <tr>
                 <td>মোট পরিবারের সদস্য সংখ্যা</td>

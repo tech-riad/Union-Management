@@ -302,7 +302,7 @@
 
                 <div class="info-row">
                     <span class="info-label">স্থায়ী ঠিকানা:</span>
-                    <span class="info-value">{{ $applicant->permanent_address_bangla ?? $formData['permanent_address_bangla'] ?? 'ঠিকানা' }}</span>
+                    <span class="info-value">{{ $applicant->permanent_address ?? $formData['permanent_address'] ?? 'ঠিকানা' }}</span>
                 </div>
 
                 <div class="info-row">

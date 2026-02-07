@@ -202,7 +202,7 @@
                 <td>স্থায়ী ঠিকানা</td>
                 <td>
 
-                    {{$applicant->permanent_address_bangla ?? 'নাই'}}
+                    {{$applicant->permanent_address ?? 'নাই'}}
                 </td>
             </tr>
         </table>
