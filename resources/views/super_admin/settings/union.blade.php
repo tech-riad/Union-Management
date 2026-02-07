@@ -75,7 +75,7 @@
         <form action="{{ route('super_admin.settings.union.update') }}" method="POST" enctype="multipart/form-data" id="settingsForm">
             @csrf
             @method('PUT')
-            
+
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Left Column: Basic Info & Media -->
                 <div class="lg:col-span-2 space-y-6">
@@ -93,8 +93,8 @@
                                     <label class="block text-sm font-medium text-gray-700 mb-2">
                                         ইউনিয়ন নাম (বাংলা) *
                                     </label>
-                                    <input type="text" 
-                                           name="union_name_bangla" 
+                                    <input type="text"
+                                           name="union_name_bangla"
                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('union_name_bangla') border-red-500 @enderror"
                                            value="{{ old('union_name_bangla', $settings->union_name_bangla) }}"
                                            placeholder="ইউনিয়ন পরিষদ, উত্তর গাবতলী"
@@ -103,13 +103,13 @@
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">
                                         ইউনিয়ন নাম (ইংরেজি) *
                                     </label>
-                                    <input type="text" 
-                                           name="union_name" 
+                                    <input type="text"
+                                           name="union_name"
                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('union_name') border-red-500 @enderror"
                                            value="{{ old('union_name', $settings->union_name) }}"
                                            placeholder="Union Parishad, North Gabtali"
@@ -118,7 +118,7 @@
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">
                                         যোগাযোগ নম্বর *
@@ -127,8 +127,8 @@
                                         <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                             <i class="fas fa-phone"></i>
                                         </span>
-                                        <input type="text" 
-                                               name="contact_number" 
+                                        <input type="text"
+                                               name="contact_number"
                                                class="w-full px-4 py-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('contact_number') border-red-500 @enderror"
                                                value="{{ old('contact_number', $settings->contact_number) }}"
                                                placeholder="১৬৩৪৫"
@@ -138,7 +138,7 @@
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">
                                         জরুরী নম্বর
@@ -147,8 +147,8 @@
                                         <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                             <i class="fas fa-ambulance"></i>
                                         </span>
-                                        <input type="text" 
-                                               name="emergency_number" 
+                                        <input type="text"
+                                               name="emergency_number"
                                                class="w-full px-4 py-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('emergency_number') border-red-500 @enderror"
                                                value="{{ old('emergency_number', $settings->emergency_number) }}"
                                                placeholder="৯৯৯">
@@ -157,7 +157,7 @@
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
-                                
+
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-medium text-gray-700 mb-2">
                                         ইমেইল *
@@ -166,8 +166,8 @@
                                         <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                             <i class="fas fa-envelope"></i>
                                         </span>
-                                        <input type="email" 
-                                               name="email" 
+                                        <input type="email"
+                                               name="email"
                                                class="w-full px-4 py-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('email') border-red-500 @enderror"
                                                value="{{ old('email', $settings->email) }}"
                                                placeholder="info@union.gov.bd"
@@ -177,12 +177,12 @@
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">
                                         ঠিকানা (বাংলা) *
                                     </label>
-                                    <textarea name="address_bangla" 
+                                    <textarea name="address_bangla"
                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('address_bangla') border-red-500 @enderror"
                                               rows="3"
                                               placeholder="উত্তর গাবতলী, গাবতলী উপজেলা, বগুড়া"
@@ -191,12 +191,12 @@
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">
                                         ঠিকানা (ইংরেজি) *
                                     </label>
-                                    <textarea name="address" 
+                                    <textarea name="address"
                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('address') border-red-500 @enderror"
                                               rows="3"
                                               placeholder="North Gabtali, Gabtali Upazila, Bogura"
@@ -224,8 +224,8 @@
                                     <label class="block text-sm font-medium text-gray-700 mb-2">
                                         চেয়ারম্যানের নাম *
                                     </label>
-                                    <input type="text" 
-                                           name="chairman_name" 
+                                    <input type="text"
+                                           name="chairman_name"
                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 @error('chairman_name') border-red-500 @enderror"
                                            value="{{ old('chairman_name', $settings->chairman_name) }}"
                                            placeholder="মোঃ রফিকুল ইসলাম"
@@ -234,13 +234,13 @@
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
-                                
+
                                 <div class="mb-6">
                                     <label class="block text-sm font-medium text-gray-700 mb-2">
                                         চেয়ারম্যানের ফোন *
                                     </label>
-                                    <input type="text" 
-                                           name="chairman_phone" 
+                                    <input type="text"
+                                           name="chairman_phone"
                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 @error('chairman_phone') border-red-500 @enderror"
                                            value="{{ old('chairman_phone', $settings->chairman_phone) }}"
                                            placeholder="০১৭XXXXXXXX"
@@ -249,21 +249,21 @@
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
-                                
+
                                 <!-- Chairman Signature -->
                                 <div class="mb-6">
                                     <label class="block text-sm font-medium text-gray-700 mb-2">
                                         চেয়ারম্যান স্বাক্ষর
                                     </label>
                                     <div class="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center hover:border-blue-500 transition-colors duration-200">
-                                        @if($settings->chairman_signature_url)
+                                        @if($settings->chairman_signature)
                                             <div class="mb-4">
-                                                <img src="{{ $settings->chairman_signature_url }}" 
-                                                     alt="Chairman Signature" 
+                                                <img src="{{ Storage::url($settings->chairman_signature) }}"
+                                                     alt="Chairman Signature"
                                                      class="mx-auto max-h-32 border rounded-lg">
                                             </div>
-                                            <button type="button" 
-                                                    onclick="deleteImage('chairman_signature')" 
+                                            <button type="button"
+                                                    onclick="deleteImage('chairman_signature')"
                                                     class="px-3 py-1 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors duration-200 text-sm">
                                                 <i class="fas fa-trash mr-1"></i> মুছুন
                                             </button>
@@ -273,28 +273,28 @@
                                                 <p class="text-gray-500 text-sm">স্বাক্ষর আপলোড করা হয়নি</p>
                                             </div>
                                         @endif
-                                        <input type="file" 
-                                               name="chairman_signature" 
+                                        <input type="file"
+                                               name="chairman_signature"
                                                class="mt-4 w-full px-3 py-2 border border-gray-300 rounded-lg"
                                                accept="image/*">
                                         <p class="text-xs text-gray-500 mt-2">PNG/JPG (সুপারিশ: 200x100px)</p>
                                     </div>
                                 </div>
-                                
+
                                 <!-- Chairman Seal -->
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">
                                         চেয়ারম্যান সীল
                                     </label>
                                     <div class="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center hover:border-blue-500 transition-colors duration-200">
-                                        @if($settings->chairman_seal_url)
+                                        @if($settings->chairman_seal)
                                             <div class="mb-4">
-                                                <img src="{{ $settings->chairman_seal_url }}" 
-                                                     alt="Chairman Seal" 
+                                                <img src="{{ Storage::url($settings->chairman_seal) }}"
+                                                     alt="Chairman Seal"
                                                      class="mx-auto w-32 h-32 border rounded-full object-cover">
                                             </div>
-                                            <button type="button" 
-                                                    onclick="deleteImage('chairman_seal')" 
+                                            <button type="button"
+                                                    onclick="deleteImage('chairman_seal')"
                                                     class="px-3 py-1 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors duration-200 text-sm">
                                                 <i class="fas fa-trash mr-1"></i> মুছুন
                                             </button>
@@ -304,8 +304,8 @@
                                                 <p class="text-gray-500 text-sm">সীল আপলোড করা হয়নি</p>
                                             </div>
                                         @endif
-                                        <input type="file" 
-                                               name="chairman_seal" 
+                                        <input type="file"
+                                               name="chairman_seal"
                                                class="mt-4 w-full px-3 py-2 border border-gray-300 rounded-lg"
                                                accept="image/*">
                                         <p class="text-xs text-gray-500 mt-2">PNG/JPG (সুপারিশ: 150x150px)</p>
@@ -327,8 +327,8 @@
                                     <label class="block text-sm font-medium text-gray-700 mb-2">
                                         সচিবের নাম *
                                     </label>
-                                    <input type="text" 
-                                           name="secretary_name" 
+                                    <input type="text"
+                                           name="secretary_name"
                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('secretary_name') border-red-500 @enderror"
                                            value="{{ old('secretary_name', $settings->secretary_name) }}"
                                            placeholder="মোঃ আব্দুল করিম"
@@ -337,13 +337,13 @@
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
-                                
+
                                 <div class="mb-6">
                                     <label class="block text-sm font-medium text-gray-700 mb-2">
                                         সচিবের ফোন *
                                     </label>
-                                    <input type="text" 
-                                           name="secretary_phone" 
+                                    <input type="text"
+                                           name="secretary_phone"
                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('secretary_phone') border-red-500 @enderror"
                                            value="{{ old('secretary_phone', $settings->secretary_phone) }}"
                                            placeholder="০১৭XXXXXXXX"
@@ -352,7 +352,7 @@
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
-                                
+
                                 <!-- Secretary Signature -->
                                 <div class="mb-6">
                                     <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -361,12 +361,12 @@
                                     <div class="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center hover:border-blue-500 transition-colors duration-200">
                                         @if($settings->secretary_signature_url)
                                             <div class="mb-4">
-                                                <img src="{{ $settings->secretary_signature_url }}" 
-                                                     alt="Secretary Signature" 
+                                                <img src="{{ $settings->secretary_signature_url }}"
+                                                     alt="Secretary Signature"
                                                      class="mx-auto max-h-32 border rounded-lg">
                                             </div>
-                                            <button type="button" 
-                                                    onclick="deleteImage('secretary_signature')" 
+                                            <button type="button"
+                                                    onclick="deleteImage('secretary_signature')"
                                                     class="px-3 py-1 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors duration-200 text-sm">
                                                 <i class="fas fa-trash mr-1"></i> মুছুন
                                             </button>
@@ -376,14 +376,14 @@
                                                 <p class="text-gray-500 text-sm">স্বাক্ষর আপলোড করা হয়নি</p>
                                             </div>
                                         @endif
-                                        <input type="file" 
-                                               name="secretary_signature" 
+                                        <input type="file"
+                                               name="secretary_signature"
                                                class="mt-4 w-full px-3 py-2 border border-gray-300 rounded-lg"
                                                accept="image/*">
                                         <p class="text-xs text-gray-500 mt-2">PNG/JPG (সুপারিশ: 200x100px)</p>
                                     </div>
                                 </div>
-                                
+
                                 <!-- Office Hours -->
                                 <div class="mb-6">
                                     <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -392,16 +392,16 @@
                                     <div class="grid grid-cols-2 gap-4">
                                         <div>
                                             <label class="block text-xs text-gray-600 mb-1">শুরুর সময়</label>
-                                            <input type="time" 
-                                                   name="office_start_time" 
+                                            <input type="time"
+                                                   name="office_start_time"
                                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('office_start_time') border-red-500 @enderror"
                                                    value="{{ old('office_start_time', $settings->office_start_time?->format('H:i') ?? '09:00') }}"
                                                    required>
                                         </div>
                                         <div>
                                             <label class="block text-xs text-gray-600 mb-1">শেষের সময়</label>
-                                            <input type="time" 
-                                                   name="office_end_time" 
+                                            <input type="time"
+                                                   name="office_end_time"
                                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('office_end_time') border-red-500 @enderror"
                                                    value="{{ old('office_end_time', $settings->office_end_time?->format('H:i') ?? '17:00') }}"
                                                    required>
@@ -414,13 +414,13 @@
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">
                                         কাজের দিন *
                                     </label>
-                                    <input type="text" 
-                                           name="working_days" 
+                                    <input type="text"
+                                           name="working_days"
                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('working_days') border-red-500 @enderror"
                                            value="{{ old('working_days', $settings->working_days ?? 'রবিবার - বৃহস্পতিবার') }}"
                                            placeholder="রবিবার - বৃহস্পতিবার"
@@ -453,12 +453,12 @@
                                 <div class="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center hover:border-blue-500 transition-colors duration-200">
                                     @if($settings->logo_url)
                                         <div class="mb-4">
-                                            <img src="{{ $settings->logo_url }}" 
-                                                 alt="Union Logo" 
+                                            <img src="{{ $settings->logo_url }}"
+                                                 alt="Union Logo"
                                                  class="mx-auto max-h-32 border rounded-lg">
                                         </div>
-                                        <button type="button" 
-                                                onclick="deleteImage('logo')" 
+                                        <button type="button"
+                                                onclick="deleteImage('logo')"
                                                 class="px-3 py-1 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors duration-200 text-sm">
                                             <i class="fas fa-trash mr-1"></i> মুছুন
                                         </button>
@@ -468,14 +468,14 @@
                                             <p class="text-gray-500 text-sm">লোগো আপলোড করা হয়নি</p>
                                         </div>
                                     @endif
-                                    <input type="file" 
-                                           name="logo" 
+                                    <input type="file"
+                                           name="logo"
                                            class="mt-4 w-full px-3 py-2 border border-gray-300 rounded-lg"
                                            accept="image/*">
                                     <p class="text-xs text-gray-500 mt-2">PNG/JPG/SVG (সুপারিশ: 300x300px)</p>
                                 </div>
                             </div>
-                            
+
                             <!-- Favicon -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -484,12 +484,12 @@
                                 <div class="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center hover:border-blue-500 transition-colors duration-200">
                                     @if($settings->favicon_url)
                                         <div class="mb-4">
-                                            <img src="{{ $settings->favicon_url }}" 
-                                                 alt="Favicon" 
+                                            <img src="{{ $settings->favicon_url }}"
+                                                 alt="Favicon"
                                                  class="mx-auto w-16 h-16 border rounded-lg">
                                         </div>
-                                        <button type="button" 
-                                                onclick="deleteImage('favicon')" 
+                                        <button type="button"
+                                                onclick="deleteImage('favicon')"
                                                 class="px-3 py-1 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors duration-200 text-sm">
                                             <i class="fas fa-trash mr-1"></i> মুছুন
                                         </button>
@@ -499,8 +499,8 @@
                                             <p class="text-gray-500 text-sm">ফ্যাভিকন আপলোড করা হয়নি</p>
                                         </div>
                                     @endif
-                                    <input type="file" 
-                                           name="favicon" 
+                                    <input type="file"
+                                           name="favicon"
                                            class="mt-4 w-full px-3 py-2 border border-gray-300 rounded-lg"
                                            accept="image/*">
                                     <p class="text-xs text-gray-500 mt-2">PNG/ICO (সুপারিশ: 64x64px)</p>
@@ -524,35 +524,35 @@
                                         প্রাইমারি কালার
                                     </label>
                                     <div class="flex items-center space-x-4">
-                                        <input type="color" 
-                                               name="primary_color" 
+                                        <input type="color"
+                                               name="primary_color"
                                                class="w-16 h-10 border border-gray-300 rounded cursor-pointer"
                                                value="{{ old('primary_color', $settings->primary_color ?? '#3b82f6') }}">
-                                        <input type="text" 
-                                               name="primary_color_text" 
+                                        <input type="text"
+                                               name="primary_color_text"
                                                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg"
                                                value="{{ old('primary_color', $settings->primary_color ?? '#3b82f6') }}"
                                                placeholder="#3b82f6">
                                     </div>
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">
                                         সেকেন্ডারি কালার
                                     </label>
                                     <div class="flex items-center space-x-4">
-                                        <input type="color" 
-                                               name="secondary_color" 
+                                        <input type="color"
+                                               name="secondary_color"
                                                class="w-16 h-10 border border-gray-300 rounded cursor-pointer"
                                                value="{{ old('secondary_color', $settings->secondary_color ?? '#10b981') }}">
-                                        <input type="text" 
-                                               name="secondary_color_text" 
+                                        <input type="text"
+                                               name="secondary_color_text"
                                                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg"
                                                value="{{ old('secondary_color', $settings->secondary_color ?? '#10b981') }}"
                                                placeholder="#10b981">
                                     </div>
                                 </div>
-                                
+
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -564,7 +564,7 @@
                                             <option value="EUR" {{ old('currency', $settings->currency) == 'EUR' ? 'selected' : '' }}>€ - EUR</option>
                                         </select>
                                     </div>
-                                    
+
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-2">
                                             সময় অঞ্চল *
@@ -575,7 +575,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                
+
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -587,7 +587,7 @@
                                             <option value="Y-m-d" {{ old('date_format', $settings->date_format) == 'Y-m-d' ? 'selected' : '' }}>২০২৪-১২-২৫</option>
                                         </select>
                                     </div>
-                                    
+
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-2">
                                             সময় ফরম্যাট *
@@ -620,14 +620,14 @@
                                         <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                             <i class="fas fa-globe"></i>
                                         </span>
-                                        <input type="url" 
-                                               name="website" 
+                                        <input type="url"
+                                               name="website"
                                                class="w-full px-4 py-2 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                value="{{ old('website', $settings->website) }}"
                                                placeholder="https://union.gov.bd">
                                     </div>
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">
                                         ফেসবুক
@@ -636,14 +636,14 @@
                                         <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                             <i class="fab fa-facebook-f"></i>
                                         </span>
-                                        <input type="url" 
-                                               name="facebook" 
+                                        <input type="url"
+                                               name="facebook"
                                                class="w-full px-4 py-2 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                value="{{ old('facebook', $settings->facebook) }}"
                                                placeholder="https://facebook.com/union">
                                     </div>
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">
                                         টুইটার
@@ -652,14 +652,14 @@
                                         <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                             <i class="fab fa-twitter"></i>
                                         </span>
-                                        <input type="url" 
-                                               name="twitter" 
+                                        <input type="url"
+                                               name="twitter"
                                                class="w-full px-4 py-2 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                value="{{ old('twitter', $settings->twitter) }}"
                                                placeholder="https://twitter.com/union">
                                     </div>
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">
                                         ইউটিউব
@@ -668,8 +668,8 @@
                                         <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                             <i class="fab fa-youtube"></i>
                                         </span>
-                                        <input type="url" 
-                                               name="youtube" 
+                                        <input type="url"
+                                               name="youtube"
                                                class="w-full px-4 py-2 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                value="{{ old('youtube', $settings->youtube) }}"
                                                placeholder="https://youtube.com/union">
@@ -689,9 +689,9 @@
                         </div>
                         <div class="p-6">
                             <div class="flex items-start">
-                                <input class="mt-1 mr-3 w-5 h-5 rounded focus:ring-blue-500 text-blue-600" 
-                                       type="checkbox" 
-                                       name="maintenance_mode" 
+                                <input class="mt-1 mr-3 w-5 h-5 rounded focus:ring-blue-500 text-blue-600"
+                                       type="checkbox"
+                                       name="maintenance_mode"
                                        id="maintenance_mode"
                                        value="1"
                                        {{ old('maintenance_mode', $settings->maintenance_mode) ? 'checked' : '' }}>
@@ -755,11 +755,11 @@
         // Color picker synchronization
         document.querySelectorAll('input[type="color"]').forEach(colorPicker => {
             const textInput = colorPicker.parentNode.querySelector('input[type="text"]');
-            
+
             colorPicker.addEventListener('input', function() {
                 textInput.value = this.value;
             });
-            
+
             textInput.addEventListener('input', function() {
                 if (this.value.match(/^#[0-9A-F]{6}$/i)) {
                     colorPicker.value = this.value;
@@ -767,13 +767,13 @@
             });
         });
     });
-    
+
     // Image deletion
     function deleteImage(type) {
         if (!confirm('আপনি কি এই ছবিটি ডিলিট করতে চান?')) {
             return;
         }
-        
+
         fetch('{{ route("super_admin.settings.union.delete-image") }}', {
             method: 'POST',
             headers: {
@@ -796,7 +796,7 @@
             alert('নেটওয়ার্ক সমস্যা হয়েছে।');
         });
     }
-    
+
     // Reset modal functions
     function resetAllSettings() {
         const modal = document.getElementById('resetModal');
@@ -806,7 +806,7 @@
             modal.querySelector('div > div').classList.add('scale-100', 'opacity-100');
         }, 10);
     }
-    
+
     function closeResetModal() {
         const modal = document.getElementById('resetModal');
         modal.querySelector('div > div').classList.remove('scale-100', 'opacity-100');
@@ -815,72 +815,72 @@
             modal.classList.add('hidden');
         }, 300);
     }
-    
+
     function confirmReset() {
         window.location.href = '{{ route("super_admin.settings.union.reset") }}';
     }
-    
+
     // Close modal when clicking outside
     document.getElementById('resetModal').addEventListener('click', function(e) {
         if (e.target === this) {
             closeResetModal();
         }
     });
-    
+
     // Form validation
     document.getElementById('settingsForm').addEventListener('submit', function(e) {
         const primaryColor = document.querySelector('input[name="primary_color"]').value;
         const secondaryColor = document.querySelector('input[name="secondary_color"]').value;
-        
+
         const hexRegex = /^#[0-9A-F]{6}$/i;
-        
+
         if (!hexRegex.test(primaryColor)) {
             alert('প্রাইমারি কালার সঠিক হেক্স ফরম্যাটে দিন (যেমন: #3b82f6)');
             e.preventDefault();
             return false;
         }
-        
+
         if (!hexRegex.test(secondaryColor)) {
             alert('সেকেন্ডারি কালার সঠিক হেক্স ফরম্যাটে দিন (যেমন: #10b981)');
             e.preventDefault();
             return false;
         }
-        
+
         return true;
     });
-    
+
     // Show toast notification
     function showToast(message, type = 'success') {
         const toast = document.createElement('div');
         toast.className = `fixed top-4 right-4 px-6 py-4 rounded-xl shadow-lg z-50 transition-all duration-300 transform translate-x-full`;
-        
+
         const typeClasses = {
             success: 'bg-gradient-to-r from-green-500 to-emerald-600 text-white',
             error: 'bg-gradient-to-r from-red-500 to-rose-600 text-white',
             warning: 'bg-gradient-to-r from-yellow-500 to-orange-600 text-white',
             info: 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white'
         };
-        
+
         toast.classList.add(typeClasses[type]);
-        
+
         const icon = type === 'success' ? 'check-circle' :
                     type === 'error' ? 'exclamation-circle' :
                     type === 'warning' ? 'exclamation-triangle' : 'info-circle';
-        
+
         toast.innerHTML = `
             <div class="flex items-center space-x-3">
                 <i class="fas fa-${icon} text-xl"></i>
                 <span>${message}</span>
             </div>
         `;
-        
+
         document.body.appendChild(toast);
-        
+
         setTimeout(() => {
             toast.classList.remove('translate-x-full');
             toast.style.transform = 'translateX(0)';
         }, 10);
-        
+
         setTimeout(() => {
             toast.classList.add('translate-x-full');
             setTimeout(() => {
